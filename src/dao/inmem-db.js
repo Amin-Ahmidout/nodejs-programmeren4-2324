@@ -4,6 +4,7 @@
 // De array bevat een aantal dummy records.
 // De database heeft twee methoden: get en add.
 // Opdracht: Voeg de overige methoden toe.
+
 //
 const database = {
     // het array met dummy records. Dit is de 'database'.
@@ -37,6 +38,18 @@ const database = {
         }, this._delayTime)
     },
 
+    findUserByEmail(email, callback) {
+        // Simulate an asynchronous operation
+        setTimeout(() => {
+            const user = this._data.find((item) => item.emailAdress === email)
+            if (user) {
+                callback(null, user)
+            } else {
+                callback(null, null)
+            }
+        }, this._delayTime)
+    },
+    
     getById(id, callback) {
         // Simuleer een asynchrone operatie
         setTimeout(() => {
@@ -60,9 +73,46 @@ const database = {
             // met het toegevoegde item als argument, of null als er een fout is opgetreden
             callback(null, item)
         }, this._delayTime)
-    }
+    },
 
     // Voeg zelf de overige database functionaliteit toe
+    update(id, newData, callback) {
+        // Simuleer een asynchrone operatie
+        setTimeout(() => {
+            if (id < 0 || id >= this._data.length) {
+                callback({ message: `Error: id ${id} does not exist!` }, null)
+            } else {
+                // Vind het item met de opgegeven id
+                const item = this._data[id]
+
+                // Update de velden met de nieuwe data
+                Object.assign(item, newData)
+
+                // Roep de callback aan het einde van de operatie
+                // met het bijgewerkte item als argument, of null als er een fout is opgetreden
+                callback(null, item)
+            }
+        }, this._delayTime)
+    },
+
+    delete(id, callback) {
+        // Simulate an asynchronous operation
+        setTimeout(() => {
+            if (id < 0 || id >= this._data.length) {
+                callback({ message: `Error: id ${id} does not exist!` }, null)
+            } else {
+                // Find the index of the item with the specified id
+                const index = this._data.findIndex((item) => item.id === id)
+
+                // Remove the item from the array
+                const deletedItem = this._data.splice(index, 1)[0]
+
+                // Call the callback at the end of the operation
+                // with the deleted item as argument, or null if an error occurred
+                callback(null, deletedItem)
+            }
+        }, this._delayTime)
+    }
 }
 
 module.exports = database
