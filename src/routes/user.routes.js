@@ -77,7 +77,7 @@ const validateUniqueEmail = (req, res, next) => {
         }
         next();
     });
-};
+}; 
 
 
 
