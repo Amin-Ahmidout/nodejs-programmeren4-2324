@@ -1,12 +1,13 @@
 const express = require('express')
 const userRoutes = require('./src/routes/user.routes')
+require('dotenv').config()
 
 const app = express()
 
 // express.json zorgt dat we de body van een request kunnen lezen
 app.use(express.json())
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 app.all('*', (req, res, next) => {
     console.log('Request:', req.method, req.url)
