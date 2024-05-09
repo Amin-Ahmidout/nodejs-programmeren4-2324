@@ -36,6 +36,26 @@ const mealService = {
             }
         })
     },
+
+    deleteMeal: (id, callback) => {
+        database.deleteMeal(id, (err, data) => {
+            if (err) {
+                callback(err, null)
+            } else {
+                if (data) {
+                    callback(null, {
+                        message: `Meal with ID ${id} deleted successfully.`,
+                        data: data
+                    })
+                } else {
+                    callback(null, {
+                        message: `Meal with ID ${id} not found.`,
+                        data: null
+                    })
+                }
+            }
+        })
+    }
 }
 
 module.exports = mealService
