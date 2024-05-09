@@ -69,7 +69,7 @@ const userService = {
     },
 
     delete: (id, callback) => {
-        database.delete(id, (err, data) => {
+        database.deleteUser(id, (err, data) => {
             if (err) {
                 callback(err, null);
             } else {
