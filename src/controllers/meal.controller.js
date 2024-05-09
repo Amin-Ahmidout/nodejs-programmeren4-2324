@@ -1,8 +1,8 @@
 const mealService = require('../services/meal.service')
 
 let mealController = {
-    getAll: (req, res, next) => {
-        mealService.getAll((error, success) => {
+    getAllMeals: (req, res, next) => {
+        mealService.getAllMeals((error, success) => {
             if (error) {
                 return next({
                     status: error.status,
@@ -20,3 +20,5 @@ let mealController = {
         })
     },
 }
+
+module.exports = mealController

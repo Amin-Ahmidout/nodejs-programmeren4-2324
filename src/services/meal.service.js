@@ -1,10 +1,10 @@
 const database = require('../dao/inmem-db')
-const pool = require('../dao/dbconnection')
+
 
 const mealService = {
     
-    getAll: (callback) => {
-        database.getAll((err, data) => {
+    getAllMeals: (callback) => {
+        database.getAllMeals((err, data) => {
             if (err) {
                 callback(err, null)
             } else {
@@ -17,3 +17,5 @@ const mealService = {
         })
     },
 }
+
+module.exports = mealService
