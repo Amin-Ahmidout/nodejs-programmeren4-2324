@@ -8,5 +8,6 @@ const database = require('../dao/inmem-db') // Replace '../path/to/database' wit
 const mealService = require('../services/meal.service')
 
 router.get('/api/meal/', mealController.getAllMeals)
+router.get('/api/meal/:mealId', mealController.getMealById)
 
 module.exports = router
