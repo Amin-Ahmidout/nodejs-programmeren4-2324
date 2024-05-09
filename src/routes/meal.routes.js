@@ -10,5 +10,7 @@ const mealService = require('../services/meal.service')
 router.get('/api/meal/', mealController.getAllMeals)
 router.get('/api/meal/:mealId', mealController.getMealById)
 router.delete('/api/meal/:mealId', mealController.deleteMeal)
+router.post('/api/meal/', mealController.createMeal)
+
 
 module.exports = router

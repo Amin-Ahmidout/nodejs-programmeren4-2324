@@ -55,6 +55,19 @@ const mealService = {
                 }
             }
         })
+    },
+
+    createMeal: (meal, callback) => {
+        database.createMeal(meal, (err, data) => {
+            if (err) {
+                callback(err, null)
+            } else {
+                callback(null, {
+                    message: `Meal created with ID ${data.id}.`,
+                    data: data
+                })
+            }
+        })
     }
 }
 
