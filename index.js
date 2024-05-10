@@ -1,12 +1,14 @@
 const express = require('express')
 const userRoutes = require('./src/routes/user.routes')
+const mealRoutes = require('./src/routes/meal.routes')
+require('dotenv').config()
 
 const app = express()
 
 // express.json zorgt dat we de body van een request kunnen lezen
 app.use(express.json())
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT
 
 app.all('*', (req, res, next) => {
     console.log('Request:', req.method, req.url)
@@ -29,6 +31,7 @@ app.get('/api/info', (req, res) => {
 
 // Hier komen alle routes
 app.use(userRoutes)
+app.use(mealRoutes)
 
 // Hier komt de route error handler te staan!
 app.use((req, res, next) => {

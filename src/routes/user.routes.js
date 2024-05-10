@@ -60,7 +60,7 @@ const validateEmail = (req, res, next) => {
 
 const validateUniqueEmail = (req, res, next) => {
     const email = req.body.emailAdress;
-    database.findUserByEmail(email, (err, existingUser) => {
+    database.getUserByEmail(email, (err, existingUser) => {
         if (err) {
             return res.status(500).json({
                 status: 500,

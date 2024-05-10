@@ -2,7 +2,7 @@ const database = require('../dao/inmem-db')
 
 const userService = {
     create: (user, callback) => {
-        database.add(user, (err, data) => {
+        database.addUser(user, (err, data) => {
             if (err) {
                 callback(err, null)
             } else {
@@ -29,7 +29,7 @@ const userService = {
     },
 
     getById: (id, callback) => {
-        database.getById(id, (err, data) => {
+        database.getUserById(id, (err, data) => {
             if (err) {
                 callback(err, null);
             } else {
@@ -69,7 +69,7 @@ const userService = {
     },
 
     delete: (id, callback) => {
-        database.delete(id, (err, data) => {
+        database.deleteUser(id, (err, data) => {
             if (err) {
                 callback(err, null);
             } else {
