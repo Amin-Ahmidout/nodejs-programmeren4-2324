@@ -1,3 +1,4 @@
+const { updateUser } = require('../dao/inmem-db')
 const userService = require('../services/user.service')
 
 let userController = {
@@ -64,11 +65,11 @@ let userController = {
     },
 
     // Todo: Implement the update and delete methods
-    update: (req, res, next) => {
+    updateUser: (req, res, next) => {
         const userId = req.params.userId;
         const updatedUser = req.body;
         
-        userService.update(userId, updatedUser, (error, success) => {
+        userService.updateUser(userId, updatedUser, (error, success) => {
             if (error) {
                 return next({
                     status: error.status,
