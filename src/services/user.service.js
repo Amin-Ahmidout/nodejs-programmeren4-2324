@@ -48,8 +48,8 @@ const userService = {
         })
     },
 
-    update: (id, updatedUser, callback) => {
-        database.update(id, updatedUser, (err, data) => {
+    updateUser: (id, updatedUser, callback) => {
+        database.updateUser(id, updatedUser, (err, data) => {
             if (err) {
                 callback(err, null);
             } else {
