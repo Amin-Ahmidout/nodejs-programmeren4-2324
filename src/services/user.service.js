@@ -86,7 +86,27 @@ const userService = {
                 }
             }
         });
-    }
+    },
+
+    getProfile: (userId, callback) => {
+        database.getProfile(userId, (err, data) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                if (data) {
+                    callback(null, {
+                        message: `Profile found for user with id ${userId}.`,
+                        data: data
+                    });
+                } else {
+                    callback(null, {
+                        message: `User not found with  id ${userId}.`,
+                        data: null
+                    });
+                }
+            }
+        });
+    },
 }
 
 module.exports = userService

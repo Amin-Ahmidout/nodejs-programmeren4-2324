@@ -174,6 +174,21 @@ const mysqlDb = {
         })
     },
 
+    getProfile(id, callback) {
+        pool.query('SELECT * FROM user WHERE id = ?', [id], (err, results) => {
+            if (err) {
+                callback(err, null)
+            } else {
+                if (results.length > 0) {
+                    callback(null, results[0])
+                } else {
+                    console.log('id', id)
+                    callback({ message: 'User not found' }, null)
+                }
+            }
+        })
+    },
+
     getConnection: (callback) => {
         pool.getConnection((err, connection) => {
             if (err) {

@@ -85,6 +85,7 @@ const validateUniqueEmail = (req, res, next) => {
 // Userroutes
 router.post('/api/user', validateUserCreateAssert, validateEmail, validateUniqueEmail, userController.create)
 router.get('/api/user', userController.getAll)
+router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', validateToken, userController.getById)
 
 // Tijdelijke routes om niet bestaande routes op te vangen

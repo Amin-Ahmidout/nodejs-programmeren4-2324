@@ -53,7 +53,9 @@ function validateToken(req, res, next) {
       }
       if (payload) {
         logger.debug("token is valid", payload);
-        req.userId = payload.userId;
+        req.userId = payload.id;
+        logger.debug("userId:", req.userId);
+        logger.debug("payload:", payload.id);
         next();
       }
     });
