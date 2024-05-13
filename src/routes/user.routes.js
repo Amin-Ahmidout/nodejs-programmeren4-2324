@@ -6,6 +6,7 @@ const router = express.Router()
 const userController = require('../controllers/user.controller')
 const database = require('../dao/inmem-db') // Replace '../path/to/database' with the actual path to your database module or object
 const userService = require('../services/user.service')
+const { validateToken } = require('../routes/auth.routes');
 
 // Importeer de juiste database-module of -object
 
@@ -84,10 +85,12 @@ const validateUniqueEmail = (req, res, next) => {
 // Userroutes
 router.post('/api/user', validateUserCreateAssert, validateEmail, validateUniqueEmail, userController.create)
 router.get('/api/user', userController.getAll)
-router.get('/api/user/:userId', userController.getById)
+router.get('/api/user/profile', validateToken, userController.getProfile)
+router.get('/api/user/:userId', validateToken, userController.getById)
+
 
 // Tijdelijke routes om niet bestaande routes op te vangen
-router.put('/api/user/:userId', userController.update)
+router.put('/api/user/:userId', userController.updateUser)
 router.delete('/api/user/:userId', userController.delete)
 
 

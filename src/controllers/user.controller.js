@@ -1,4 +1,4 @@
-const { updateUser } = require('../dao/inmem-db')
+const { updateUser, getUserByField } = require('../dao/inmem-db')
 const userService = require('../services/user.service')
 
 let userController = {
@@ -26,22 +26,23 @@ let userController = {
     },
 
     getAll: (req, res, next) => {
-        userService.getAll((error, success) => {
+        // Extract filters from query parameters
+        const filters = req.query;
+     
+        userService.getAll(filters, (error, success) => {
             if (error) {
                 return next({
-                    status: error.status,
+                    status: error.status || 400,  
                     message: error.message,
                     data: {}
-                })
+                });
             }
-            if (success) {
-                res.status(200).json({
-                    status: 200,
-                    message: success.message,
-                    data: success.data
-                })
-            }
-        })
+            res.status(200).json({
+                status: 200,
+                message: success.message,
+                data: success.data
+            });
+        });
     },
 
     getById: (req, res, next) => {
@@ -106,7 +107,29 @@ let userController = {
                 });
             }
         });
-    }
+    },
+
+    getProfile: (req, res, next) => {
+        const userId = req.userId;
+        console.log('userId by controller', userId);
+        userService.getProfile(userId, (error, success) => {
+            if (error) {
+                return next({
+                    status: error.status,
+                    message: error.message,
+                    data: {}
+                });
+            }
+            if (success) {
+                res.status(200).json({
+                    status: success.status,
+                    message: success.message,
+                    data: success.data
+                });
+            }
+        });
+    },
+
 }
 
 module.exports = userController

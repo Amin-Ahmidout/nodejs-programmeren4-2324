@@ -1,12 +1,21 @@
 const express = require('express')
 const userRoutes = require('./src/routes/user.routes')
 const mealRoutes = require('./src/routes/meal.routes')
+const {
+    router: authRoutes,
+    validateToken,
+  } = require("./src/routes/auth.routes");
 require('dotenv').config()
 
 const app = express()
 
 // express.json zorgt dat we de body van een request kunnen lezen
 app.use(express.json())
+
+app.use(authRoutes)
+app.use(userRoutes)
+app.use(mealRoutes)
+
 
 const port = process.env.PORT
 
@@ -30,8 +39,6 @@ app.get('/api/info', (req, res) => {
 })
 
 // Hier komen alle routes
-app.use(userRoutes)
-app.use(mealRoutes)
 
 // Hier komt de route error handler te staan!
 app.use((req, res, next) => {
