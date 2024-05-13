@@ -32,8 +32,8 @@ let userController = {
         userService.getAll(filters, (error, success) => {
             if (error) {
                 return next({
-                    status: error.status || 400,  // Provide a default error status
-                    message: error.message || 'Invalid input',
+                    status: error.status || 400,  
+                    message: error.message,
                     data: {}
                 });
             }
