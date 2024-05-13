@@ -32,14 +32,35 @@ const mysqlDb = {
     },
 
     // Retrieve all users
-    getAll(callback) {
-        pool.query('SELECT * FROM user', (err, results) => {
-            if (err) {
-                callback(err, null)
-            } else {
-                callback(null, results)
+    getAll: (filters, callback) => {
+        let sql = "SELECT * FROM user";
+        const values = [];
+        const conditions = [];
+     
+        if (filters && Object.keys(filters).length) {
+            Object.keys(filters).forEach(key => {
+                // Add a check to ensure the field is valid
+                if (['firstName', 'lastName', 'emailAddress', 'isActive', 'id'].includes(key)) {
+                    conditions.push(`${key} = ?`);
+                    values.push(filters[key]);
+                } else {
+                    // Return error if the field is not valid
+                    return callback(new Error(`Invalid field: ${key}`), null);
+                }
+            });
+     
+            if (conditions.length) {
+                sql += " WHERE " + conditions.join(" AND ");
             }
-        })
+        }
+     
+        pool.query(sql, values, (err, results) => {
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, results);
+            }
+        });
     },
 
     // Get a single user by ID
@@ -173,6 +194,8 @@ const mysqlDb = {
             callback(null, results[0])
         })
     },
+
+
 
     getProfile(id, callback) {
         pool.query('SELECT * FROM user WHERE id = ?', [id], (err, results) => {

@@ -88,6 +88,7 @@ router.get('/api/user', userController.getAll)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', validateToken, userController.getById)
 
+
 // Tijdelijke routes om niet bestaande routes op te vangen
 router.put('/api/user/:userId', userController.updateUser)
 router.delete('/api/user/:userId', userController.delete)
