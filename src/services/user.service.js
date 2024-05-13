@@ -1,4 +1,4 @@
-const { get } = require('../..')
+
 const database = require('../dao/inmem-db')
 
 const userService = {
@@ -9,7 +9,8 @@ const userService = {
             } else {
                 callback(null, {
                     message: `User created with id ${data.id}.`,
-                    data: data
+                    data: data,
+                    status: 200
                 })
             }
         })
