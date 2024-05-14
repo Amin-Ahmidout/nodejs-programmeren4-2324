@@ -4,6 +4,8 @@ const server = require('../index')
 const tracer = require('tracer')
 const expect = chai.expect
 const assert = require('assert')
+const jwt = require('jsonwebtoken')
+const jwtSecretKey = require("../src/util/config").secretkey;
 
 chai.should()
 chai.use(chaiHttp)
@@ -209,7 +211,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                     })
             })
     })
-})
+
 
 
 
@@ -296,7 +298,7 @@ describe('UC201 Registreren als nieuwe user', () => {
  
 
        // TC-203-1 Invalid token
- it('TC-203-1 Invalid token', (done) => {
+       it('TC-203-1 Invalid token', (done) => {
   chai.request(server)
       .get('/api/user/profile')
       .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
@@ -308,5 +310,22 @@ describe('UC201 Registreren als nieuwe user', () => {
           expect(res.body).to.have.property('data').that.is.an('object').that.is.empty; // Adjusted expectation
           done();
       });
-});  
+       })  
 
+      it('TC-203-2 Gebruiker is ingelogd met geldig token', (done) => {
+        // Generate a valid token for authentication
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+
+        chai.request(server)
+          .get('/api/user/profile')
+          .set('Authorization', `Bearer ${token}`)
+          .end((err, res) => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('object');
+            expect(res.body).to.have.property('data').that.is.an('object');
+            expect(res.body).to.have.property('message').that.is.a('string');
+            expect(res.body.message).to.equal('Profile found for user with id 1.');
+            done();
+          });
+      });
+})
