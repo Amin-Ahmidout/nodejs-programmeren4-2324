@@ -181,31 +181,35 @@ getUserById(id, callback) {
   },
 
    // login function
-   login(email, password, callback) {
-    console.log(email)
+login(email, password, callback) {
+    console.log(email);
     pool.query(
-        'SELECT * FROM user WHERE emailAdress = ? AND password = ?',
-        [email, password],
+        'SELECT * FROM user WHERE emailAdress = ?',
+        [email],
         (err, results) => {
             if (err) {
-                callback(err, null)
+                callback(err, null);
             } else {
                 if (results.length > 0) {
-                    const user = results[0]
-                    const token = jwt.sign({ id: user.id }, jwtSecretKey, { expiresIn: '12d' })
-                    callback(null, {
-                        id: user.id,
-                        emailAdress: user.emailAdress,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        token
-                    })
+                    const user = results[0];
+                    if (user.password === password) {
+                        const token = jwt.sign({ id: user.id }, jwtSecretKey, { expiresIn: '12d' });
+                        callback(null, {
+                            id: user.id,
+                            emailAdress: user.emailAdress,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            token
+                        });
+                    } else {
+                        callback({ status: 400, message: 'Passwords do not match' }, null);
+                    }
                 } else {
-                    callback({ message: 'Authentication failed' }, null)
+                    callback({ message: 'Authentication failed' }, null);
                 }
             }
         }
-    )
+    );
 },
 
 getUserByEmail: (email, callback) => {

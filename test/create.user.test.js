@@ -69,78 +69,134 @@ describe('UC201 Registreren als nieuwe user', () => {
             })
     })
 
-    it.skip('TC-201-3 Niet-valide password', (done) => {})
-
-    it("TC-201-4 When a user already exists, a valid error should be returned", (done) => {
+    it('TC-201-3 Niet-valide wachtwoord', (done) => {
       const testUser = {
-        firstName: "John",
-        lastName: "Doe",
-        emailAdress: "TESTFOREXISTING@avans.nl",
-        password: "secret",
-        street: "Mainstreet",
-        city: "New York",
-        roles: "editor,guest",
-      };
-   
-      // Create the user for the first time
-      chai
-        .request(server)
-        .post("/api/user")
+        firstName: 'John',
+        lastName: 'Doe',
+        emailAdress: 'test@example.com',
+        password: 'secret',
+        street: 'Mainstreet',
+        city: 'New York',
+        roles: 'editor,guest'
+      }
+
+      // Add the user
+      chai.request(server)
+        .post('/api/user')
         .send(testUser)
         .end((err, res) => {
-          assert.ifError(err);
-   
-          res.should.have.status(200);
-          res.should.be.an("object");
+          assert.ifError(err)
+
+          res.should.have.status(200)
+          res.should.be.an('object')
           res.body.should.be
-            .an("object")
-            .that.has.all.keys("status", "message", "data");
-   
-          // Try to create the same user again
-          chai
-            .request(server)
-            .post("/api/user")
+            .an('object')
+            .that.has.all.keys('status', 'message', 'data')
+
+          // Attempt to log in with a different password
+          chai.request(server)
+            .post('/api/login')
+            .send({
+              email: testUser.emailAdress,
+              password: 'wrongpassword'
+            })
+            .end((err, res) => {
+              assert.ifError(err)
+
+              res.should.have.status(400)
+              res.should.be.an('object')
+              res.body.should.be
+                .an('object')
+                .that.has.all.keys('status', 'message')
+
+              // Delete the user
+              chai.request(server)
+                .delete(`/api/user/${res.body.data.userId}`)
+                .end((err, res) => {
+                  assert.ifError(err)
+
+                  res.should.have.status(200)
+                  res.should.be.an('object')
+                  res.body.should.be
+                    .an('object')
+                    .that.has.all.keys('status', 'message')
+
+                  done()
+                })
+            })
+        })
+    })
+
+    it('TC-201-4 When a user already exists, a valid error should be returned', (done) => {
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 'TESTFOREXISTING@avans.nl',
+            password: 'secret',
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
+
+        // Create the user for the first time
+        chai.request(server)
+            .post('/api/user')
             .send(testUser)
             .end((err, res) => {
-              assert.ifError(err);
-   
-              res.should.have.status(400);
-              res.should.be.an("object");
-              res.body.should.be
-                .an("object")
-                .that.has.all.keys("status", "message", "data");
-   
-              let { status, message } = res.body;
-              status.should.be.a("number");
-              message.should.be.a("string").that.equals("User already exists");
-   
-              // Delete the user after the test
-              chai
-                .request(server)
-                .post("/api/login")
-                .send({
-                  emailAdress: testUser.emailAdress,
-                  password: testUser.password,
-                })
-                .end((loginErr, loginRes) => {
-                  if (loginErr) return done(loginErr);
-   
-                  loginRes.should.have.status(200);
-                  const token = loginRes.body.data.token;
-   
-                  chai
-                    .request(server)
-                    .delete(`/api/user/${loginRes.body.data.id}`)
-                    .set("Authorization", `Bearer ${token}`)
-                    .end((deleteErr, deleteRes) => {
-                      if (deleteErr) return done(deleteErr);
-                      deleteRes.should.have.status(200);
-                      done();
-                    });
-                });
-            });
-        });
-    });
+                assert.ifError(err)
+
+                res.should.have.status(200)
+                res.should.be.an('object')
+                res.body.should.be
+                    .an('object')
+                    .that.has.all.keys('status', 'message', 'data')
+
+                // Try to create the same user again
+                chai.request(server)
+                    .post('/api/user')
+                    .send(testUser)
+                    .end((err, res) => {
+                        assert.ifError(err)
+
+                        res.should.have.status(400)
+                        res.should.be.an('object')
+                        res.body.should.be
+                            .an('object')
+                            .that.has.all.keys('status', 'message', 'data')
+
+                        let { status, message } = res.body
+                        status.should.be.a('number')
+                        message.should.be
+                            .a('string')
+                            .that.equals('User already exists')
+
+                        // Delete the user after the test
+                        chai.request(server)
+                            .post('/api/login')
+                            .send({
+                                emailAdress: testUser.emailAdress,
+                                password: testUser.password
+                            })
+                            .end((loginErr, loginRes) => {
+                                if (loginErr) return done(loginErr)
+
+                                loginRes.should.have.status(200)
+                                const token = loginRes.body.data.token
+
+                                chai.request(server)
+                                    .delete(
+                                        `/api/user/${loginRes.body.data.id}`
+                                    )
+                                    .set('Authorization', `Bearer ${token}`)
+                                    .end((deleteErr, deleteRes) => {
+                                        if (deleteErr) return done(deleteErr)
+                                        deleteRes.should.have.status(200)
+                                        done()
+                                    })
+                            })
+                    })
+            })
+    })
 
     it('TC-201-5 Gebruiker succesvol geregistreerd', (done) => {
         chai.request(server)
