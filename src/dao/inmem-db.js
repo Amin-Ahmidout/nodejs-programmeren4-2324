@@ -205,7 +205,7 @@ login(email, password, callback) {
                         callback({ status: 400, message: 'Passwords do not match' }, null);
                     }
                 } else {
-                    callback({ message: 'Authentication failed' }, null);
+                    callback({ status: 404, message: 'User not found' }, null);
                 }
             }
         }
