@@ -23,6 +23,20 @@ const notFound = (req, res, next) => {
     })
 }
 
+// Input validation function 1
+const validateEmailPresence = (req, res, next) => {
+    try {
+        assert(req.body.emailAdress, 'Missing email');
+        next();
+    } catch (ex) {
+        return res.status(400).json({
+            status: 400,
+            message: ex.message,
+            data: {}
+        });
+    }
+};
+
 
 
 // Input validation function 2 met gebruik van assert
@@ -106,7 +120,7 @@ router.get('/api/user/:userId', validateToken, userController.getById)
 
 
 // Tijdelijke routes om niet bestaande routes op te vangen
-router.put('/api/user/:userId', userController.updateUser)
+router.put('/api/user/:userId', validateEmail, validateToken, userController.updateUser)
 router.delete('/api/user/:userId', userController.delete)
 
 
