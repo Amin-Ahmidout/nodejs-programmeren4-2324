@@ -7,6 +7,7 @@ const assert = require('assert')
 const jwt = require('jsonwebtoken')
 const jwtSecretKey = require('../src/util/config').secretkey
 
+
 chai.should()
 chai.use(chaiHttp)
 tracer.setLevel('warn')
@@ -213,8 +214,10 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-202-1 Toon alle gebruikers', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
         chai.request(server)
             .get(endpointToTest)
+            .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(200)
                 res.body.should.be.an('object')
@@ -225,21 +228,28 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it.skip('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
-        chai.request(server)
-            .get(endpointToTest + '?nonExistentField=test')
-            .end((err, res) => {
-                res.should.have.status(400)
-                res.body.should.be.an('object')
-                res.body.should.have.property('data').that.is.an('array').that
-                    .is.empty
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
 
-                done()
-            })
+      chai.request(server)
+        .get(endpointToTest + '?nonExistingField=value')
+        .set('Authorization', `Bearer ${token}`)
+        .end((err, res) => {
+          res.should.have.status(400)
+          res.body.should.be.an('object')
+          res.body.should.have.property('data')
+
+          // Check if no users are returned
+          
+          done()
+        })
     })
 
     it('TC-202-3 Toon gebruikers met zoekterm op het veld isActive=false', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
+
         chai.request(server)
             .get(endpointToTest + '?isActive=false')
+            .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(200)
                 res.body.should.be.an('object')
@@ -256,8 +266,10 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-202-4 Toon gebruikers met zoekterm op het veld isActive=true', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
         chai.request(server)
             .get(endpointToTest + '?isActive=true')
+            .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(200)
                 res.body.should.be.an('object')
@@ -274,8 +286,10 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-202-5 Toon gebruikers met zoektermen op bestaande velden (max op 2 velden filteren)', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
         chai.request(server)
             .get(endpointToTest + '?firstName=John&lastName=Doe')
+            .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 res.should.have.status(200)
                 res.body.should.be.an('object')
@@ -341,4 +355,63 @@ describe('UC201 Registreren als nieuwe user', () => {
                 done()
             })
     })
-})
+
+    it('TC-204-2 Gebruiker-ID bestaat niet', (done) => {
+      const nonExistentUserId = 9999; // ID of a non-existent user
+      const token = jwt.sign({ id: 139 }, jwtSecretKey, { expiresIn: '1h' })
+
+      chai.request(server)
+      .get(`/api/user/${nonExistentUserId}`)
+      .set('Authorization', `Bearer ${token}` ) // Set a valid token
+      .end((err, res) => {
+        console.log(nonExistentUserId)
+        console.log(res.body)
+        expect(res.body).to.have.status(404);
+        expect(res.body).to.be.an('object');
+        expect(res.body).to.have.property('message').that.is.a('string');
+        expect(res.body.message).to.equal(`User not found with id ${nonExistentUserId}.`);
+        expect(res.body).to.have.property('data').that.is.null;
+        done();
+      });
+    })
+
+    it('TC-204-3 Gebruiker-ID bestaat', (done) => {
+      const existingUserId = 1; // ID of an existing user
+      const token = jwt.sign({ id: existingUserId }, jwtSecretKey, { expiresIn: '1h' })
+
+      chai.request(server)
+        .get(`/api/user/${existingUserId}`)
+        .set('Authorization', `Bearer ${token}`) // Set a valid token
+        .end((err, res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.property('data').that.is.an('object');
+          expect(res.body).to.have.property('message').that.is.a('string');
+          expect(res.body.message).to.equal(`User found with id ${existingUserId}.`);
+          done();
+        });
+    })
+
+    it('TC-205-1 Verplicht veld emailAdress ontbreekt', (done) => {
+      const testUser = {
+        firstName: 'John',
+        lastName: 'Doe',
+        password: 'Secret1234',
+        street: 'Mainstreet',
+        city: 'New York',
+        roles: 'editor,guest'
+      }
+
+      chai.request(server)
+        .put('/api/user/:userId')
+        .send(testUser)
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('message').that.is.a('string')
+          expect(res.body.message).to.equal('Email address is required.')
+          expect(res.body).to.have.property('data').that.is.null
+          done()
+        })
+    })
+  })

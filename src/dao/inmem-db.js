@@ -68,13 +68,20 @@ const mysqlDb = {
 getUserById(id, callback) {
     pool.query('SELECT * FROM user WHERE id = ?', [id], (err, results) => {
         if (err) {
-            callback(err, null)
+            callback(err, null);
         } else {
-            callback(null, results[0])
+            if (results.length > 0) {
+                const user = results[0];
+                callback(null, results[0]);
+            } else {
+                if (user.id !== id) {
+                    callback({ status: 404, message: 'User not found' }, null);
+                }
+                
+            }
         }
-    })
+    });
 },
- 
   // Get a single user by ID
   getUserById(id, callback) {
     pool.query("SELECT * FROM user WHERE id = ?", [id], (err, results) => {
