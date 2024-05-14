@@ -516,4 +516,18 @@ describe('UC201 Registreren als nieuwe user', () => {
           done()
         })
     })
+
+    it('TC-205-5 Niet ingelogd', (done) => {
+      chai.request(server)
+        .put('/api/user/:userId')
+        .send({ firstName: 'Updated' })
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('message').that.is.a('string')
+          expect(res.body.message).to.equal('Invalid email address')
+          expect(res.body).to.have.property('data').that.is.empty
+          done()
+        })
+    })
   })
