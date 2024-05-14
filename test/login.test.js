@@ -89,4 +89,56 @@ describe('UC101 Inloggen', () => {
                 done()
             })
     })
+
+    it('TC-101-4 Gebruiker succesvol ingelogd', (done) => {
+        // Create a test user
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 'test@example.com',
+            password: 'Secret123456',
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
+        // Add the user
+        chai.request(server)
+            .post('/api/user')
+            .send(testUser)
+            .end((err, res) => {
+                assert.ifError(err)
+                res.should.have.status(200)
+                res.should.be.an('object')
+ 
+   
+                const userId = res.body.data.id;
+   
+                // Attempt to log in with the correct password
+                chai.request(server)
+                    .post('/api/login')
+                    .send({
+                        emailAdress: testUser.emailAdress,
+                        password: 'Secret123456' // Correct password
+                    })
+                    .end((err, res) => {
+                        assert.ifError(err)
+                        res.should.have.status(200)
+                        res.should.be.an('object')
+                        console.log(testUser.id)
+                        // Delete the user
+                        chai.request(server)
+                            .delete(`/api/user/${userId}`)
+                            .end((err, res) => {
+                                assert.ifError(err)
+   
+                                res.should.have.status(200)
+                                res.should.be.an('object')
+                           
+   
+                                done()
+                            })
+                    })
+            })
+    })
+
 })
