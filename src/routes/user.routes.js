@@ -23,6 +23,20 @@ const notFound = (req, res, next) => {
     })
 }
 
+// Input validation function 1
+const validateEmailPresence = (req, res, next) => {
+    try {
+        assert(req.body.emailAdress, 'Missing email');
+        next();
+    } catch (ex) {
+        return res.status(400).json({
+            status: 400,
+            message: ex.message,
+            data: {}
+        });
+    }
+};
+
 
 
 // Input validation function 2 met gebruik van assert
@@ -80,17 +94,49 @@ const validateUniqueEmail = (req, res, next) => {
     });
 }; 
 
+const validatePassword = (req, res, next) => {
+    try {
+        const password = req.body.password;
+        if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+            throw new Error('Invalid password. Password must be at least 8 characters long, contain at least 1 uppercase letter, and at least 1 digit.');
+        }
+        next();
+    } catch (ex) {
+        return res.status(400).json({
+            status: 400,
+            message: ex.message,
+            data: {}
+        });
+    }
+};
+
+const validatePhoneNumber = (req, res, next) => {
+    try {
+        const phoneNumber = req.body.phoneNumber;
+        if (phoneNumber && (!/^(06)\d{8}$/.test(phoneNumber))) {
+            throw new Error('Invalid phone number. Phone number must start with 06 and have 10 digits.');
+        }
+        next();
+    } catch (ex) {
+        return res.status(400).json({
+            status: 400,
+            message: ex.message,
+            data: {}
+        });
+    }
+};
+
 
 
 // Userroutes
-router.post('/api/user', validateUserCreateAssert, validateEmail, validateUniqueEmail, userController.create)
-router.get('/api/user', userController.getAll)
+router.post('/api/user', validateUserCreateAssert, validateEmail, validateUniqueEmail, validatePassword, validatePhoneNumber, userController.create)
+router.get('/api/user', validateToken, userController.getAll)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', validateToken, userController.getById)
 
 
 // Tijdelijke routes om niet bestaande routes op te vangen
-router.put('/api/user/:userId', userController.updateUser)
+router.put('/api/user/:userId', validateEmail, validateToken, validatePhoneNumber, userController.updateUser)
 router.delete('/api/user/:userId', userController.delete)
 
 
