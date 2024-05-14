@@ -393,6 +393,7 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-205-1 Verplicht veld emailAdress ontbreekt', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
       const testUser = {
         firstName: 'John',
         lastName: 'Doe',
@@ -404,6 +405,7 @@ describe('UC201 Registreren als nieuwe user', () => {
 
       chai.request(server)
         .put('/api/user/:userId')
+        .set('Authorization', `Bearer ${token}`)
         .send(testUser)
         .end((err, res) => {
           expect(res).to.have.status(400)
