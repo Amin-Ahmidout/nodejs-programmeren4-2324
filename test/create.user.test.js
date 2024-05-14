@@ -209,66 +209,104 @@ describe('UC201 Registreren als nieuwe user', () => {
                     })
             })
     })
-
-    it('TC-202-1 Toon alle gebruikers', (done) => {
-      chai.request(server)
-      .get(endpointToTest)
-      .end((err, res) => {
-        res.should.have.status(200)
-        res.body.should.be.an('object')
-        res.body.should.have.property('data').that.is.an('array')
-
-        done()
-      })
-    })
-
- 
-    it.skip('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
-      chai.request(server)
-        .get(endpointToTest + '?nonExistentField=test')
-        .end((err, res) => {
-          res.should.have.status(400)
-          res.body.should.be.an('object')
-          res.body.should.have.property('data').that.is.an('array').that.is.empty
-
-          done()
-        })
-    })
-
-    it('TC-202-3 Toon gebruikers met zoekterm op het veld isActive=false', (done) => {
-      chai.request(server)
-        .get(endpointToTest + '?isActive=false')
-        .end((err, res) => {
-          res.should.have.status(200)
-          res.body.should.be.an('object')
-          res.body.should.have.property('data').that.is.an('array')
-
-          // Check if all returned users have isActive=false
-          const users = res.body.data
-          users.forEach(user => {
-            expect(user.isActive='false')
-          })
-
-          done() 
-        })
-    })
-
-    it('TC-202-4 Toon gebruikers met zoekterm op het veld isActive=true', (done) => {
-      chai.request(server)
-        .get(endpointToTest + '?isActive=true')
-        .end((err, res) => {
-          res.should.have.status(200)
-          res.body.should.be.an('object')
-          res.body.should.have.property('data').that.is.an('array')
-
-          // Check if all returned users have isActive=true
-          const users = res.body.data
-          users.forEach(user => {
-            expect(user.isActive='true')
-          })
-
-          done() 
-        })
-    })
-    
 })
+
+
+
+        it('TC-202-1 Toon alle gebruikers', (done) => {
+            chai.request(server)
+                .get(endpointToTest)
+                .end((err, res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.an('object')
+                    res.body.should.have.property('data').that.is.an('array')
+
+                    done()
+                })
+        })
+
+        it.skip('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
+            chai.request(server)
+                .get(endpointToTest + '?nonExistentField=test')
+                .end((err, res) => {
+                    res.should.have.status(400)
+                    res.body.should.be.an('object')
+                    res.body.should.have.property('data').that.is.an('array')
+                        .that.is.empty
+
+                    done()
+                })
+        })
+
+        it('TC-202-3 Toon gebruikers met zoekterm op het veld isActive=false', (done) => {
+            chai.request(server)
+                .get(endpointToTest + '?isActive=false')
+                .end((err, res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.an('object')
+                    res.body.should.have.property('data').that.is.an('array')
+
+                    // Check if all returned users have isActive=false
+                    const users = res.body.data
+                    users.forEach((user) => {
+                        expect((user.isActive = 'false'))
+                    })
+
+                    done()
+                })
+        })
+
+        it('TC-202-4 Toon gebruikers met zoekterm op het veld isActive=true', (done) => {
+            chai.request(server)
+                .get(endpointToTest + '?isActive=true')
+                .end((err, res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.an('object')
+                    res.body.should.have.property('data').that.is.an('array')
+
+                    // Check if all returned users have isActive=true
+                    const users = res.body.data
+                    users.forEach((user) => {
+                        expect((user.isActive = 'true'))
+                    })
+
+                    done()
+                })
+        })
+
+        it('TC-202-5 Toon gebruikers met zoektermen op bestaande velden (max op 2 velden filteren)', (done) => {
+            chai.request(server)
+                .get(endpointToTest + '?firstName=John&lastName=Doe')
+                .end((err, res) => {
+                    res.should.have.status(200)
+                    res.body.should.be.an('object')
+                    res.body.should.have.property('data').that.is.an('array')
+
+                    // Check if all returned users have the specified first name and last name
+                    const users = res.body.data
+                    users.forEach((user) => {
+                        expect(user.firstName).to.equal('John')
+                        expect(user.lastName).to.equal('Doe')
+                    })
+
+                    done()
+                })
+        })
+    
+ 
+
+       // TC-203-1 Invalid token
+ it('TC-203-1 Invalid token', (done) => {
+  chai.request(server)
+      .get('/api/user/profile')
+      .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
+      .end((err, res) => {
+          expect(res).to.have.status(401);
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.property('message').that.is.a('string');
+          expect(res.body.message).to.equal('Token invalid!'); // Updated to match actual message
+          expect(res.body).to.have.property('data').that.is.an('object').that.is.empty; // Adjusted expectation
+          done();
+      });
+});  
+
