@@ -70,34 +70,32 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it('TC-201-3 Niet-valide wachtwoord', (done) => {
-      const testUser = {
-        firstName: 'John',
-        lastName: 'Doe',
-        emailAdress: 'test@example.com',
-        password: 'short', // Invalid password
-        street: 'Mainstreet',
-        city: 'New York',
-        roles: 'editor,guest'
-      }
-    
-      // Attempt to add the user with an invalid password
-      chai.request(server)
-        .post('/api/user')
-        .send(testUser)
-        .end((err, res) => {
-          assert.ifError(err)
-    
-          // The server should respond with a 400 status code for invalid input
-          res.should.have.status(400)
-          res.should.be.an('object')
-          res.body.should.be
-            .an('object')
-            .that.has.all.keys('status', 'message', 'data')
-    
-      
-    
-          done()
-        })
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 'test@example.com',
+            password: 'short', // Invalid password
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
+
+        // Attempt to add the user with an invalid password
+        chai.request(server)
+            .post('/api/user')
+            .send(testUser)
+            .end((err, res) => {
+                assert.ifError(err)
+
+                // The server should respond with a 400 status code for invalid input
+                res.should.have.status(400)
+                res.should.be.an('object')
+                res.body.should.be
+                    .an('object')
+                    .that.has.all.keys('status', 'message', 'data')
+
+                done()
+            })
     })
 
     it('TC-201-4 When a user already exists, a valid error should be returned', (done) => {
@@ -211,4 +209,66 @@ describe('UC201 Registreren als nieuwe user', () => {
                     })
             })
     })
+
+    it('TC-202-1 Toon alle gebruikers', (done) => {
+      chai.request(server)
+      .get(endpointToTest)
+      .end((err, res) => {
+        res.should.have.status(200)
+        res.body.should.be.an('object')
+        res.body.should.have.property('data').that.is.an('array')
+
+        done()
+      })
+    })
+
+ 
+    it.skip('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
+      chai.request(server)
+        .get(endpointToTest + '?nonExistentField=test')
+        .end((err, res) => {
+          res.should.have.status(400)
+          res.body.should.be.an('object')
+          res.body.should.have.property('data').that.is.an('array').that.is.empty
+
+          done()
+        })
+    })
+
+    it('TC-202-3 Toon gebruikers met zoekterm op het veld isActive=false', (done) => {
+      chai.request(server)
+        .get(endpointToTest + '?isActive=false')
+        .end((err, res) => {
+          res.should.have.status(200)
+          res.body.should.be.an('object')
+          res.body.should.have.property('data').that.is.an('array')
+
+          // Check if all returned users have isActive=false
+          const users = res.body.data
+          users.forEach(user => {
+            expect(user.isActive='false')
+          })
+
+          done() 
+        })
+    })
+
+    it('TC-202-4 Toon gebruikers met zoekterm op het veld isActive=true', (done) => {
+      chai.request(server)
+        .get(endpointToTest + '?isActive=true')
+        .end((err, res) => {
+          res.should.have.status(200)
+          res.body.should.be.an('object')
+          res.body.should.have.property('data').that.is.an('array')
+
+          // Check if all returned users have isActive=true
+          const users = res.body.data
+          users.forEach(user => {
+            expect(user.isActive='true')
+          })
+
+          done() 
+        })
+    })
+    
 })
