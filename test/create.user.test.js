@@ -181,7 +181,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 isActive: 1,
                 emailAdress: 'f.l@server.com',
                 password: 'Secret1234',
-                phoneNumber: '06 12425495',
+                phoneNumber: '0612425495',
                 roles: 'editor,guest',
                 street: '',
                 city: ''
@@ -199,7 +199,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 data.should.have.property('emailAdress')
                 data.should.have.property('id').that.is.a('number')
                 data.should.have.property('isActive').equals(1)
-                data.should.have.property('phoneNumber').equals('06 12425495')
+                data.should.have.property('phoneNumber').equals('0612425495')
                 data.should.have.property('roles').equals('editor,guest')
                 data.should.have.property('password').equals('Secret1234')
 
@@ -470,5 +470,32 @@ describe('UC201 Registreren als nieuwe user', () => {
           })
         })
       })
+    })
+
+    it('TC-205-3 Niet valide telefoonnummer', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
+      const testUser = {
+        firstName: 'John',
+        lastName: 'Doe',
+        emailAdress: 'test@example.com',
+        password: 'Secret1234',
+        phoneNumber: '123456789', // Invalid phone number
+        street: 'Mainstreet',
+        city: 'New York',
+        roles: 'editor,guest'
+      }
+
+      chai.request(server)
+        .put('/api/user/:userId')
+        .set('Authorization', `Bearer ${token}`)
+        .send(testUser)
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('message').that.is.a('string')
+          expect(res.body.message).to.equal('Invalid phone number. Phone number must start with 06 and have 10 digits.')
+          expect(res.body).to.have.property('data').that.is.empty
+          done()
+        })
     })
   })
