@@ -498,4 +498,22 @@ describe('UC201 Registreren als nieuwe user', () => {
           done()
         })
     })
+
+    it('TC-205-4 Gebruiker bestaat niet', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
+      const nonExistentUserId = 999 // ID of a non-existent user
+
+      chai.request(server)
+        .put(`/api/user/${nonExistentUserId}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send({ firstName: 'Updated' })
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('message').that.is.a('string')
+          expect(res.body.message).to.equal(`Invalid email address`)
+          expect(res.body).to.have.property('data').that.is.empty
+          done()
+        })
+    })
   })
