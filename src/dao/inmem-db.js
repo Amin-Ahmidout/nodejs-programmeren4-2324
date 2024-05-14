@@ -145,7 +145,7 @@ getUserById(id, callback) {
             message: `User with ID ${id} successfully deleted`,
           });
         } else {
-          callback({ message: `User with ID ${id} not found` }, null);
+          callback({ status: 400, message: `User with ID ${id} not found` }, null);
         }
       }
     });
