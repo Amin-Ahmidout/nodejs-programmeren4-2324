@@ -1,4 +1,4 @@
-const { updateUser, getUserByField } = require('../dao/inmem-db')
+// const { updateUser} = require('../dao/inmem-db')
 const userService = require('../services/user.service')
 
 let userController = {

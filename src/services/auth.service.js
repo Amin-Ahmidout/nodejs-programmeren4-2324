@@ -10,12 +10,14 @@ const authService = {
                 if (data) {
                     callback(null, {
                         message: `User authenticated successfully.`,
-                        data: data
+                        data: data,
+                        status: 200
                     })
                 } else {
                     callback(null, {
                         message: `Invalid username or password.`,
-                        data: null
+                        data: null,
+                        status: 400
                     })
                 }
             }
