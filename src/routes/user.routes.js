@@ -80,10 +80,26 @@ const validateUniqueEmail = (req, res, next) => {
     });
 }; 
 
+const validatePassword = (req, res, next) => {
+    try {
+        const password = req.body.password;
+        if (!password || password.length < 8 || !/[A-Z]/.test(password) || !/\d/.test(password)) {
+            throw new Error('Invalid password. Password must be at least 8 characters long, contain at least 1 uppercase letter, and at least 1 digit.');
+        }
+        next();
+    } catch (ex) {
+        return res.status(400).json({
+            status: 400,
+            message: ex.message,
+            data: {}
+        });
+    }
+};
+
 
 
 // Userroutes
-router.post('/api/user', validateUserCreateAssert, validateEmail, validateUniqueEmail, userController.create)
+router.post('/api/user', validateUserCreateAssert, validateEmail, validateUniqueEmail, validatePassword, userController.create)
 router.get('/api/user', userController.getAll)
 router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', validateToken, userController.getById)
