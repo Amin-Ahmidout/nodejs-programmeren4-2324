@@ -9,6 +9,6 @@ chai.should()
 chai.use(chaiHttp)
 tracer.setLevel('warn')
 
-it('TC-101-1 Verplicht veld ontbreekt'), (done) => {
+it.skip('TC-101-1 Verplicht veld ontbreekt'), (done) => {
 
 }

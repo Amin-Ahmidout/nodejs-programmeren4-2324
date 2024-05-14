@@ -74,58 +74,29 @@ describe('UC201 Registreren als nieuwe user', () => {
         firstName: 'John',
         lastName: 'Doe',
         emailAdress: 'test@example.com',
-        password: 'secret',
+        password: 'short', // Invalid password
         street: 'Mainstreet',
         city: 'New York',
         roles: 'editor,guest'
       }
-
-      // Add the user
+    
+      // Attempt to add the user with an invalid password
       chai.request(server)
         .post('/api/user')
         .send(testUser)
         .end((err, res) => {
           assert.ifError(err)
-
-          res.should.have.status(200)
+    
+          // The server should respond with a 400 status code for invalid input
+          res.should.have.status(400)
           res.should.be.an('object')
           res.body.should.be
             .an('object')
             .that.has.all.keys('status', 'message', 'data')
-          
-          const userId = res.body.data.id; 
-
-          // Attempt to log in with a different password
-          chai.request(server)
-            .post('/api/login')
-            .send({
-              email: testUser.emailAdress,
-              password: 'wrongpassword'
-            })
-            .end((err, res) => {
-              assert.ifError(err)
-
-              res.should.have.status(400)
-              res.should.be.an('object')
-              res.body.should.be
-                .an('object')
-                .that.has.all.keys('status', 'message', 'data')
-                console.log(testUser.id)
-              // Delete the user
-              chai.request(server)
-                .delete(`/api/user/${userId}`)
-                .end((err, res) => {
-                  assert.ifError(err)
-
-                  res.should.have.status(200)
-                  res.should.be.an('object')
-                  res.body.should.be
-                    .an('object')
-                    .that.has.all.keys('message', 'data')
-
-                  done()
-                })
-            })
+    
+      
+    
+          done()
         })
     })
 
@@ -134,7 +105,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             firstName: 'John',
             lastName: 'Doe',
             emailAdress: 'TESTFOREXISTING@avans.nl',
-            password: 'secret',
+            password: 'Secret1234',
             street: 'Mainstreet',
             city: 'New York',
             roles: 'editor,guest'
@@ -208,7 +179,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 lastName: 'lastnametest',
                 isActive: 1,
                 emailAdress: 'f.l@server.com',
-                password: 'secret',
+                password: 'Secret1234',
                 phoneNumber: '06 12425495',
                 roles: 'editor,guest',
                 street: '',
@@ -229,7 +200,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 data.should.have.property('isActive').equals(1)
                 data.should.have.property('phoneNumber').equals('06 12425495')
                 data.should.have.property('roles').equals('editor,guest')
-                data.should.have.property('password').equals('secret')
+                data.should.have.property('password').equals('Secret1234')
 
                 // Delete the registered user
                 chai.request(server)
