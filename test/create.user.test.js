@@ -416,4 +416,59 @@ describe('UC201 Registreren als nieuwe user', () => {
           done()
         })
     })
+
+    it('TC-205-2 De gebruiker is niet de eigenaar van de data', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
+      const testUser = {
+      firstName: 'John',
+      lastName: 'Doe',
+      emailAdress: 'test@example.com',
+      password: 'Secret1234',
+      street: 'Mainstreet',
+      city: 'New York',
+      roles: 'editor,guest'
+      }
+
+      // Create a new user
+      chai.request(server)
+      .post('/api/user')
+      .send(testUser)
+      .end((err, res) => {
+        expect(res).to.have.status(200)
+        expect(res.body).to.be.an('object')
+        expect(res.body).to.have.property('data').that.is.an('object')
+        expect(res.body).to.have.property('message').that.is.a('string')
+        expect(res.body.message).to.equal(`User created with id ${res.body.data.id}.`)
+
+        const userId = res.body.data.id
+
+        // Attempt to update the user's data with a different user's token
+        const otherUserId = 2 // ID of another user
+        const otherUserToken = jwt.sign({ id: otherUserId }, jwtSecretKey, { expiresIn: '1h' })
+
+        chai.request(server)
+        .put(`/api/user/${userId}`)
+        .set('Authorization', `Bearer ${otherUserToken}`)
+        .send({ firstName: 'Updated' })
+        .end((err, res) => {
+          expect(res).to.have.status(400)
+          expect(res.body).to.be.an('object')
+          expect(res.body).to.have.property('message').that.is.a('string')
+          expect(res.body.message).to.equal('Invalid email address')
+          expect(res.body).to.have.property('data').that.is.empty
+
+          // Delete the test user
+          chai.request(server)
+          .delete(`/api/user/${userId}`)
+          .set('Authorization', `Bearer ${token}`)
+          .end((err, res) => {
+            expect(res).to.have.status(200)
+            expect(res.body).to.be.an('object')
+            expect(res.body).to.have.property('message').that.is.a('string')
+            expect(res.body.message).to.equal(`User deleted with id ${userId}.`)
+            done()
+          })
+        })
+      })
+    })
   })
