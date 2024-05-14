@@ -92,6 +92,8 @@ describe('UC201 Registreren als nieuwe user', () => {
           res.body.should.be
             .an('object')
             .that.has.all.keys('status', 'message', 'data')
+          
+          const userId = res.body.data.id; 
 
           // Attempt to log in with a different password
           chai.request(server)
@@ -107,11 +109,11 @@ describe('UC201 Registreren als nieuwe user', () => {
               res.should.be.an('object')
               res.body.should.be
                 .an('object')
-                .that.has.all.keys('status', 'message')
-
+                .that.has.all.keys('status', 'message', 'data')
+                console.log(testUser.id)
               // Delete the user
               chai.request(server)
-                .delete(`/api/user/${res.body.data.userId}`)
+                .delete(`/api/user/${userId}`)
                 .end((err, res) => {
                   assert.ifError(err)
 
@@ -119,7 +121,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                   res.should.be.an('object')
                   res.body.should.be
                     .an('object')
-                    .that.has.all.keys('status', 'message')
+                    .that.has.all.keys('message', 'data')
 
                   done()
                 })
