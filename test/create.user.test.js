@@ -214,7 +214,7 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 })
   
-    describe('UC202 Opvragen van een overzicht van alle users', () => {
+describe('UC202 Opvragen van een overzicht van alle users', () => {
       /**
        * Voorbeeld van een beforeEach functie.
        * Hiermee kun je code hergebruiken of initialiseren.
@@ -315,7 +315,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 done()
             })
     })
-  })
+})
 
     // TC-203-1 Invalid token
     it('TC-203-1 ongeldig token', (done) => {
