@@ -235,8 +235,6 @@ describe('UC201 Registreren als nieuwe user', () => {
                 done()
             })
     })
-  })
-
   
 
     it.skip('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
@@ -317,6 +315,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 done()
             })
     })
+  })
 
     // TC-203-1 Invalid token
     it('TC-203-1 ongeldig token', (done) => {
