@@ -319,7 +319,7 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     // TC-203-1 Invalid token
-    it('TC-203-1 Invalid token', (done) => {
+    it('TC-203-1 ongeldig token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
             .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
@@ -353,7 +353,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             })
     })
 
-    it('TC-204-1 Ongeldig' , (done) => {
+    it('TC-204-1 Ongeldig token' , (done) => {
       chai.request(server)
             .get('/api/user/:userId')
             .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
