@@ -212,7 +212,16 @@ describe('UC201 Registreren als nieuwe user', () => {
                     })
             })
     })
-
+})
+  
+    describe('UC202 Opvragen van een overzicht van alle users', () => {
+      /**
+       * Voorbeeld van een beforeEach functie.
+       * Hiermee kun je code hergebruiken of initialiseren.
+       */
+      beforeEach((done) => {
+          done()
+      })
     it('TC-202-1 Toon alle gebruikers', (done) => {
       const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
         chai.request(server)
@@ -226,6 +235,9 @@ describe('UC201 Registreren als nieuwe user', () => {
                 done()
             })
     })
+  })
+
+  
 
     it.skip('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
       const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
@@ -740,4 +752,4 @@ describe('UC201 Registreren als nieuwe user', () => {
     
      
     
-  })
+  
