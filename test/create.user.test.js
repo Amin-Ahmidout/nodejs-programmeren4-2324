@@ -14,6 +14,7 @@ tracer.setLevel('warn')
 
 const endpointToTest = '/api/user'
 
+// Testcases voor de endpoints van de user API
 describe('UC201 Registreren als nieuwe user', () => {
     /**
      * Voorbeeld van een beforeEach functie.
@@ -358,6 +359,11 @@ describe('UC203 Opvragen van een gebruikersprofiel', () => {
     })
 })
 
+describe('UC-204 Opvragen van usergegevens bij ID', () => {
+    beforeEach((done) => {
+      done()
+    })
+
     it('TC-204-1 Ongeldig token' , (done) => {
       chai.request(server)
             .get('/api/user/:userId')
@@ -407,6 +413,12 @@ describe('UC203 Opvragen van een gebruikersprofiel', () => {
           expect(res.body.message).to.equal(`User found with id ${existingUserId}.`);
           done();
         });
+    })
+})
+
+describe('UC-205 Wijzigen van usergegevens', () => {
+    beforeEach((done) => {
+      done()
     })
 
     it('TC-205-1 Verplicht veld emailAdress ontbreekt', (done) => {
@@ -609,6 +621,12 @@ describe('UC203 Opvragen van een gebruikersprofiel', () => {
             })
         })
     })
+})
+
+describe('UC-206 Verwijderen van een user', () => {
+    beforeEach((done) => {
+      done()
+    })
 
     it('TC-206-1 Gebruiker bestaat niet', (done) => {
       const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
@@ -751,9 +769,9 @@ describe('UC203 Opvragen van een gebruikersprofiel', () => {
             })
         })
     })
-
+})
     
-      
+    
     
      
     
