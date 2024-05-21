@@ -317,7 +317,12 @@ describe('UC202 Opvragen van een overzicht van alle users', () => {
     })
 })
 
-    // TC-203-1 Invalid token
+describe('UC203 Opvragen van een gebruikersprofiel', () => {
+    beforeEach((done) => {
+      done()
+    })
+
+  
     it('TC-203-1 ongeldig token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
@@ -351,6 +356,7 @@ describe('UC202 Opvragen van een overzicht van alle users', () => {
                 done()
             })
     })
+})
 
     it('TC-204-1 Ongeldig token' , (done) => {
       chai.request(server)
