@@ -264,6 +264,14 @@ getProfile(id, callback) {
  
   // Meal functions -------------------------------------------------------------------------------
   createMeal(meal, callback) {
+    // Controleer of de verplichte velden aanwezig zijn
+    const requiredFields = ['name', 'description', 'price', 'dateTime', 'maxAmountOfParticipants', 'imageUrl'];
+    for (let field of requiredFields) {
+      if (!meal[field]) {
+        return callback(new Error(`Missing required field: ${field}`), null);
+      }
+    }
+  
     const sql = `
       INSERT INTO meal (name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, cookId, allergenes)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -271,17 +279,18 @@ getProfile(id, callback) {
     const values = [
       meal.name,
       meal.description,
-      meal.isActive,
-      meal.isVega,
-      meal.isVegan,
-      meal.isToTakeHome,
+      meal.isActive || false, // Zet isActive standaard op false als deze niet is opgegeven
+      meal.isVega || false, // Zet isVega standaard op false als deze niet is opgegeven
+      meal.isVegan || false, // Zet isVegan standaard op false als deze niet is opgegeven
+      meal.isToTakeHome || false, // Zet isToTakeHome standaard op false als deze niet is opgegeven
       meal.dateTime,
       meal.maxAmountOfParticipants,
       meal.price,
       meal.imageUrl,
-      meal.cookId,
-      meal.allergenes,
+      meal.cookId || null, // Zet cookId standaard op null als deze niet is opgegeven
+      meal.allergenes || '', // Zet allergenes standaard op een lege string als deze niet is opgegeven
     ];
+    
     pool.query(sql, values, (err, result) => {
       if (err) {
         callback(err, null);
@@ -290,6 +299,7 @@ getProfile(id, callback) {
       }
     });
   },
+  
  
   getAllMeals(callback) {
     const sql = "SELECT * FROM meal";

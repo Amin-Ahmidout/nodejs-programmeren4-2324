@@ -13,8 +13,8 @@ const { validateToken } = require('./auth.routes')
 function validateMissingMealFields(req, res, next) {
     const { price, name, description } = req.body;
     if (!price || !name || !description) {
-        return res.status(500).json({
-            status: 500,
+        return res.status(400).json({
+            status: 400,
             message: 'Missing meal fields',
             data: {}
         });
@@ -40,20 +40,15 @@ function validateMeal(req, res, next) {
     if (
       !name ||
       !description ||
-      isActive === undefined ||
-      isVega === undefined ||
-      isVegan === undefined ||
-      isToTakeHome === undefined ||
       !dateTime ||
       !maxAmountOfParticipants ||
-      price === undefined ||
-      !imageUrl ||
-      !allergenes
+      !price ||
+      !imageUrl
     ) {
       return res.status(400).json({
         status: 400,
         message:
-          "Missing required fields: name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, or allergenes",
+          "Missing required fields: name, description, dateTime, maxAmountOfParticipants, price, imageUrl",
         data: {},
       });
     }
@@ -87,7 +82,7 @@ function validateMeal(req, res, next) {
 router.get('/api/meal/', validateToken, mealController.getAllMeals)
 router.get('/api/meal/:mealId', validateToken, mealController.getMealById)
 router.delete('/api/meal/:mealId', validateToken, mealController.deleteMeal)
-router.post('/api/meal/', validateToken, validateMeal, mealController.createMeal)
+router.post('/api/meal/', validateToken, validateMissingMealFields, mealController.createMeal)
 
 
 module.exports = router
