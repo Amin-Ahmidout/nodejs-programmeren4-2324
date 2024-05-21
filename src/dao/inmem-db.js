@@ -37,24 +37,25 @@ const mysqlDb = {
     let sql = "SELECT * FROM user";
     const values = [];
     const conditions = [];
- 
+
     if (filters && Object.keys(filters).length) {
-        Object.keys(filters).forEach(key => {
+        for (const key of Object.keys(filters)) {
             // Add a check to ensure the field is valid
             if (['firstName', 'lastName', 'emailAddress', 'isActive', 'id'].includes(key)) {
                 conditions.push(`${key} = ?`);
                 values.push(filters[key]);
             } else {
                 // Return error if the field is not valid
-                return callback(new Error(`Invalid field: ${key}`), null);
+                callback(new Error(`Invalid field: ${key}`), null);
+                return; // Ensure we return after calling the callback with an error
             }
-        });
- 
+        }
+
         if (conditions.length) {
             sql += " WHERE " + conditions.join(" AND ");
         }
     }
- 
+
     pool.query(sql, values, (err, results) => {
         if (err) {
             callback(err, null);
@@ -63,6 +64,7 @@ const mysqlDb = {
         }
     });
 },
+
 
 // Get a single user by ID
 getUserById(id, callback) {

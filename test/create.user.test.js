@@ -238,22 +238,21 @@ describe('UC202 Opvragen van een overzicht van alle users', () => {
     })
   
 
-    it.skip('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
-      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
-
+    it('TC-202-2 Toon gebruikers met zoekterm op niet-bestaande velden', (done) => {
+      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+    
       chai.request(server)
         .get(endpointToTest + '?nonExistingField=value')
         .set('Authorization', `Bearer ${token}`)
         .end((err, res) => {
-          res.should.have.status(400)
-          res.body.should.be.an('object')
-          res.body.should.have.property('data')
-
-          // Check if no users are returned
-          
-          done()
-        })
-    })
+          res.should.have.status(400);
+          res.body.should.be.an('object');
+          res.body.should.have.property('data').that.is.empty;
+    
+          done();
+        });
+    });
+    
 
     it('TC-202-3 Toon gebruikers met zoekterm op het veld isActive=false', (done) => {
       const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
