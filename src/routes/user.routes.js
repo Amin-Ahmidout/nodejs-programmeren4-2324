@@ -59,8 +59,8 @@ const validateUserCreateAssert = (req, res, next) => {
 const validateEmail = (req, res, next) => {
     try {
         const email = req.body.emailAdress;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
+        const emailRegex = /^[a-zA-Z]\.[a-zA-Z]{2,}@([a-zA-Z]{2,}\.)+[a-zA-Z]{2,3}$/;
+        if (!emailRegex.test(email)) {
             throw new Error('Invalid email address');
         }
         next();

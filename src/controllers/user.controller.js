@@ -69,24 +69,32 @@ let userController = {
     updateUser: (req, res, next) => {
         const userId = req.params.userId;
         const updatedUser = req.body;
-        
+      
         userService.updateUser(userId, updatedUser, (error, success) => {
-            if (error) {
-                return next({
-                    status: error.status,
-                    message: error.message,
-                    data: {}
-                });
-            }
-            if (success) {
-                res.status(200).json({
-                    status: success.status,
-                    message: success.message,
-                    data: success.data
-                });
-            }
+          if (error) {
+            return next({
+              status: error.status || 500,
+              message: error.message || 'An error occurred',
+              data: {}
+            });
+          }
+          if (success) {
+            res.status(200).json({
+              status: 200,
+              message: `User with id ${userId} successfully updated.`,
+              data: success.data
+            });
+          } else {
+            res.status(404).json({
+              status: 404,
+              message: `User with id ${userId} not found.`,
+              data: {}
+            });
+          }
         });
-    },
+      },
+      
+    
 
     delete: (req, res, next) => {
         const userId = req.params.userId;

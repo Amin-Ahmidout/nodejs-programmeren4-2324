@@ -55,22 +55,25 @@ const userService = {
     updateUser: (id, updatedUser, callback) => {
         database.updateUser(id, updatedUser, (err, data) => {
             if (err) {
-                callback(err, null)
+                callback({ status: 400, message: err.message }, null);
             } else {
                 if (data) {
                     callback(null, {
+                        status: 200,
                         message: `User updated with id ${id}.`,
                         data: data
-                    })
+                    });
                 } else {
-                    callback(null, {
+                    callback({
+                        status: 404,
                         message: `User not found with id ${id}.`,
                         data: null
-                    })
+                    }, null);
                 }
             }
-        })
+        });
     },
+    
 
     delete: (id, callback) => {
         database.deleteUser(id, (err, data) => {

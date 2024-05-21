@@ -97,35 +97,67 @@ getUserById(id, callback) {
  
   // Update a user's information
   updateUser(id, newData, callback) {
-    const sql = `
-        UPDATE user
-        SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, phoneNumber = ?, roles = ?, street = ?, city = ?, isActive = ?
-        WHERE id = ?
-    `;
-    const values = [
-      newData.firstName,
-      newData.lastName,
-      newData.emailAdress,
-      newData.password,
-      newData.phoneNumber,
-      newData.roles,
-      newData.street,
-      newData.city,
-      newData.isActive,
-      id,
-    ];
-    pool.query(sql, values, (err, result) => {
-      if (err) {
-        callback(err, null);
-      } else {
-        if (result.affectedRows) {
-          callback(null, { id, ...newData });
-        } else {
-          callback({ message: `User with ID ${id} not found` }, null);
+    // Eerst de huidige waarden van de gebruiker ophalen
+    const getUserSql = 'SELECT * FROM user WHERE id = ?';
+    pool.query(getUserSql, [id], (err, results) => {
+        if (err) {
+            console.error('SQL error:', err);
+            return callback(err, null);
         }
-      }
+        if (results.length === 0) {
+            return callback({ message: `User with ID ${id} not found`, status: 404 }, null);
+        }
+
+        // Bestaande gegevens van de gebruiker
+        const existingUser = results[0];
+
+        // Gegevens bijwerken met nieuwe waarden, indien aanwezig
+        const updatedUser = {
+            firstName: newData.firstName || existingUser.firstName,
+            lastName: newData.lastName || existingUser.lastName,
+            emailAdress: newData.emailAdress || existingUser.emailAdress,
+            password: newData.password || existingUser.password,
+            phoneNumber: newData.phoneNumber || existingUser.phoneNumber,
+            roles: newData.roles || existingUser.roles,
+            street: newData.street || existingUser.street,
+            city: newData.city || existingUser.city,
+            isActive: newData.isActive !== undefined ? newData.isActive : existingUser.isActive,
+        };
+
+        const sql = `
+            UPDATE user
+            SET firstName = ?, lastName = ?, emailAdress = ?, password = ?, phoneNumber = ?, roles = ?, street = ?, city = ?, isActive = ?
+            WHERE id = ?
+        `;
+        const values = [
+            updatedUser.firstName,
+            updatedUser.lastName,
+            updatedUser.emailAdress,
+            updatedUser.password,
+            updatedUser.phoneNumber,
+            updatedUser.roles,
+            updatedUser.street,
+            updatedUser.city,
+            updatedUser.isActive,
+            id,
+        ];
+
+        pool.query(sql, values, (err, result) => {
+            if (err) {
+                console.error('SQL error:', err);
+                callback(err, null);
+            } else {
+                if (result.affectedRows) {
+                    callback(null, { id, ...updatedUser });
+                } else {
+                    callback({ message: `User with ID ${id} not found`, status: 404 }, null);
+                }
+            }
+        });
     });
-  },
+},
+
+
  
   // Delete a user
   deleteUser(id, callback) {

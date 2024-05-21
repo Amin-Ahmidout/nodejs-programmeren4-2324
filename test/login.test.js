@@ -95,7 +95,7 @@ describe('UC101 Inloggen', () => {
         const testUser = {
             firstName: 'John',
             lastName: 'Doe',
-            emailAdress: 'test@example.com',
+            emailAdress: 't.testtt@example.com',
             password: 'Secret123456',
             street: 'Mainstreet',
             city: 'New York',
