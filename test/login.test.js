@@ -4,6 +4,8 @@ const server = require('../index')
 const tracer = require('tracer')
 const expect = chai.expect
 const assert = require('assert')
+const jwt = require('jsonwebtoken')
+const jwtSecretKey = require('../src/util/config').secretkey
 
 chai.should()
 chai.use(chaiHttp)
@@ -92,6 +94,7 @@ describe('UC101 Inloggen', () => {
 
     it('TC-101-4 Gebruiker succesvol ingelogd', (done) => {
         // Create a test user
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
         const testUser = {
             firstName: 'John',
             lastName: 'Doe',
@@ -100,19 +103,23 @@ describe('UC101 Inloggen', () => {
             street: 'Mainstreet',
             city: 'New York',
             roles: 'editor,guest'
-        }
+        };
+    
         // Add the user
         chai.request(server)
             .post('/api/user')
+            .set('Authorization', `Bearer ${token}`)
             .send(testUser)
             .end((err, res) => {
-                assert.ifError(err)
-                res.should.have.status(200)
-                res.should.be.an('object')
- 
-   
+                assert.ifError(err);
+                res.should.have.status(200);
+                res.should.be.an('object');
+    
                 const userId = res.body.data.id;
-   
+    
+                // Update token with user ID
+                const updatedToken = jwt.sign({ id: userId }, jwtSecretKey, { expiresIn: '1h' });
+    
                 // Attempt to log in with the correct password
                 chai.request(server)
                     .post('/api/login')
@@ -121,24 +128,25 @@ describe('UC101 Inloggen', () => {
                         password: 'Secret123456' // Correct password
                     })
                     .end((err, res) => {
-                        assert.ifError(err)
-                        res.should.have.status(200)
-                        res.should.be.an('object')
-                        console.log(testUser.id)
+                        assert.ifError(err);
+                        res.should.have.status(200);
+                        res.should.be.an('object');
+    
                         // Delete the user
                         chai.request(server)
                             .delete(`/api/user/${userId}`)
+                            .set('Authorization', `Bearer ${updatedToken}`)
                             .end((err, res) => {
-                                assert.ifError(err)
-   
-                                res.should.have.status(200)
-                                res.should.be.an('object')
-                           
-   
-                                done()
-                            })
-                    })
-            })
-    })
+                                assert.ifError(err);
+                                res.should.have.status(200);
+                                res.should.be.an('object');
+    
+                                done();
+                            });
+                    });
+            });
+    });
+    
+    
 
 })
