@@ -457,9 +457,7 @@ describe('UC-205 Wijzigen van usergegevens', () => {
     })
 
     it('TC-205-2 De gebruiker is niet de eigenaar van de data', (done) => {
-      console.log('Test started');
-  
-      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+      
       const testUser = {
           firstName: 'John',
           lastName: 'Doe',
@@ -477,9 +475,7 @@ describe('UC-205 Wijzigen van usergegevens', () => {
           .end((err, res) => {
               if (err) {
                   console.error('Error creating user:', err);
-              } else {
-                  console.log('User creation response:', res.body);
-              }
+              } 
   
               expect(res).to.have.status(200);
               expect(res.body).to.be.an('object');
@@ -500,9 +496,7 @@ describe('UC-205 Wijzigen van usergegevens', () => {
                   .end((err, res) => {
                       if (err) {
                           console.error('Error updating user data:', err);
-                      } else {
-                          console.log('Update user data response:', res.body);
-                      }
+                      } 
   
                       expect(res).to.have.status(403);
                       expect(res.body).to.be.an('object');
@@ -517,10 +511,8 @@ describe('UC-205 Wijzigen van usergegevens', () => {
                           .end((err, res) => {
                               if (err) {
                                   console.error('Error deleting user:', err);
-                              } else {
-                                  console.log('Delete user response:', res.body);
-                              }
-  
+                              } 
+
                               expect(res).to.have.status(200);
                               expect(res.body).to.be.an('object');
                               expect(res.body).to.have.property('message').that.is.a('string');
