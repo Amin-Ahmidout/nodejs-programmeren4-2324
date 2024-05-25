@@ -697,61 +697,68 @@ describe('UC-206 Verwijderen van een user', () => {
         })
     })
 
-    it.skip('TC-206-3 Gebruiker is niet de eigenaar van de data', (done) => {
-      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+    it('TC-206-3 Gebruiker is niet de eigenaar van de data', (done) => {
       const testUser = {
         firstName: 'John',
         lastName: 'Doe',
-        emailAdress: 't.testen@example.com',
+        emailAdress: 't.testssssss@example.com',
         password: 'Secret1234',
         street: 'Mainstreet',
         city: 'New York',
         roles: 'editor,guest'
-      };
-    
-      // Create a new user
-      chai.request(server)
+    };
+
+    // Create a new user
+    chai.request(server)
         .post('/api/user')
         .send(testUser)
         .end((err, res) => {
-          console.log('Create user response:', res.body); // Logging create user response
-          expect(res).to.have.status(200);
-          expect(res.body).to.be.an('object');
-          expect(res.body).to.have.property('data').that.is.an('object');
-          expect(res.body).to.have.property('message').that.is.a('string');
-          expect(res.body.message).to.equal(`User created with id ${res.body.data.id}.`);
-    
-          const userId = res.body.data.id;
-    
-          // Attempt to update the user's data with a different user's token
-          const otherUserId = 2; // ID of another user
-          const otherUserToken = jwt.sign({ id: otherUserId }, jwtSecretKey, { expiresIn: '1h' });
-    
-          chai.request(server)
-            .delete(`/api/user/${userId}`)
-            .set('Authorization', `Bearer ${otherUserToken}`)
-            .send({ firstName: 'Updated', emailAdress: 't.testen@example.com'})
-            .end((err, res) => {
-              console.log('Update user response:', res.body); // Logging update user response
-              expect(res).to.have.status(400);
-              expect(res.body).to.be.an('object');
-              expect(res.body).to.have.property('message').that.is.a('string');
-              expect(res.body.message).to.equal('Invalid email address');
-              expect(res.body).to.have.property('data').that.is.empty;
-    
-              // Delete the test user
-              chai.request(server)
+            if (err) {
+                console.error('Error creating user:', err);
+            } 
+
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('object');
+            expect(res.body).to.have.property('data').that.is.an('object');
+            expect(res.body).to.have.property('message').that.is.a('string');
+            expect(res.body.message).to.equal(`User created with id ${res.body.data.id}.`);
+
+            const userId = res.body.data.id;
+            
+            // Attempt to update the user's data with a different user's token
+            const otherUserId = 2; // ID of another user
+            const otherUserToken = jwt.sign({ id: otherUserId }, jwtSecretKey, { expiresIn: '1h' });
+            const userToken = jwt.sign({ id: userId }, jwtSecretKey, { expiresIn: '1h' });
+            chai.request(server)
                 .delete(`/api/user/${userId}`)
-                .set('Authorization', `Bearer ${token}`)
+                .set('Authorization', `Bearer ${otherUserToken}`)
                 .end((err, res) => {
-                  console.log('Delete user response:', res.body); // Logging delete user response
-                  expect(res).to.have.status(200);
-                  expect(res.body).to.be.an('object');
-                  expect(res.body).to.have.property('message').that.is.a('string');
-                  expect(res.body.message).to.equal(`User deleted with id ${userId}.`);
-                  done();
+                    if (err) {
+                        console.error('Error updating user data:', err);
+                    } 
+
+                    expect(res).to.have.status(403);
+                    expect(res.body).to.be.an('object');
+                    expect(res.body).to.have.property('message').that.is.a('string');
+                    expect(res.body.message).to.equal('Forbidden: You can only delete your own data');
+                    expect(res.body).to.have.property('data').that.is.empty;
+
+                    // Delete the test user
+                    chai.request(server)
+                        .delete(`/api/user/${userId}`)
+                        .set('Authorization', `Bearer ${userToken}`)
+                        .end((err, res) => {
+                            if (err) {
+                                console.error('Error deleting user:', err);
+                            } 
+
+                            expect(res).to.have.status(200);
+                            expect(res.body).to.be.an('object');
+                            expect(res.body).to.have.property('message').that.is.a('string');
+                            expect(res.body.message).to.equal(`User deleted with id ${userId}.`);
+                            done();
+                        });
                 });
-            });
         });
     });
     
