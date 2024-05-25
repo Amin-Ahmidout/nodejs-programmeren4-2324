@@ -101,8 +101,11 @@ let userController = {
 
     delete: (req, res, next) => {
         const userId = req.params.userId;
+        const authUserId = req.userId;  // Extracted from validateToken middleware
+    
+        console.log(`Controller - authUserId: ${authUserId}, userId: ${userId}`);  // Add logging for debugging
         
-        userService.delete(userId, (error, success) => {
+        userService.delete(userId, authUserId, (error, success) => {
             if (error) {
                 return next({
                     status: error.status,
@@ -118,7 +121,8 @@ let userController = {
                 });
             }
         });
-    },
+    }
+    ,
 
     getProfile: (req, res, next) => {
         const userId = req.userId;

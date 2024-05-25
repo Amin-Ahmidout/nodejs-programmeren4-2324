@@ -75,30 +75,35 @@ const userService = {
                 }
             }
         });
-    }
+    },
     
-    ,
-    
-
-    delete: (id, callback) => {
+    delete: (id, authUserId, callback) => {
+        console.log(`Service - authUserId: ${authUserId}, id: ${id}`);  // Log the IDs for debugging
+        
+        if (parseInt(id) !== parseInt(authUserId)) {
+            return callback({ status: 403, message: 'Forbidden: You can only delete your own data' }, null);
+        }
         database.deleteUser(id, (err, data) => {
             if (err) {
-                callback(err, null)
+                callback({ status: 400, message: err.message }, null);
             } else {
                 if (data) {
                     callback(null, {
+                        status: 200,
                         message: `User deleted with id ${id}.`,
                         data: data
-                    })
+                    });
                 } else {
-                    callback(null, {
+                    callback({
+                        status: 404,
                         message: `User not found with id ${id}.`,
                         data: null
-                    })
+                    }, null);
                 }
             }
-        })
-    },
+        });
+    }
+    ,
 
     getProfile: (userId, callback) => {
         database.getProfile(userId, (err, data) => {

@@ -137,7 +137,7 @@ router.get('/api/user/:userId', validateToken, userController.getById)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
 router.put('/api/user/:userId', validateEmail, validateToken, validatePhoneNumber, userController.updateUser)
-router.delete('/api/user/:userId', userController.delete)
+router.delete('/api/user/:userId', validateToken, userController.delete)
 
 
 module.exports = router

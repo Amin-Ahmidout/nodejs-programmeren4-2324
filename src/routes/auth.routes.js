@@ -32,33 +32,36 @@ function validateToken(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
       logger.warn("No token provided!");
-      return next({
+      next({
           status: 401,
           message: "No token provided!",
           data: {},
       });
-  }
-  const token = authHeader.substring(7, authHeader.length);
+  } else {
+      const token = authHeader.substring(7, authHeader.length);
 
-  jwt.verify(token, jwtSecretKey, (err, payload) => {
-      if (err) {
-          logger.debug("token:" + token);
-          logger.debug("jwtSecretKey:" + jwtSecretKey);
-          logger.warn("Token invalid!" + err.message);
-          return next({
-              status: 401,
-              message: "Token invalid!",
-              data: {},
-          });
-      }
-      if (payload) {
-          logger.debug("token is valid", payload);
-          req.userId = payload.id;
-          logger.debug("userId set in request:", req.userId);
-          next();
-      }
-  });
+      jwt.verify(token, jwtSecretKey, (err, payload) => {
+          if (err) {
+              logger.debug("token:" + token);
+              logger.debug("jwtSecretKey:" + jwtSecretKey);
+              logger.warn("Token invalid!" + err.message);
+              next({
+                  status: 401,
+                  message: "Token invalid!",
+                  data: {},
+              });
+          }
+          if (payload) {
+              logger.debug("token is valid", payload);
+              req.userId = payload.id;
+              logger.debug("userId set in request:", req.userId);  // Log the userId set
+              next();
+          }
+      });
+  }
 }
+
+
 
  
 router.post('/api/login', validateLogin, authController.login)
