@@ -173,46 +173,57 @@ describe('UC201 Registreren als nieuwe user', () => {
             })
     })
 
-    it.skip('TC-201-5 Gebruiker succesvol geregistreerd', (done) => {
-        chai.request(server)
-            .post(endpointToTest)
-            .send({
-                firstName: 'firstnametest',
-                lastName: 'lastnametest',
-                isActive: 1,
-                emailAdress: 'f.laa@server.com',
-                password: 'Secret1234',
-                phoneNumber: '0612425495',
-                roles: 'editor,guest',
-                street: '',
-                city: ''
-            })
-            .end((err, res) => {
-                res.should.have.status(200)
-                res.body.should.be.a('object')
+    it('TC-201-5 Gebruiker succesvol geregistreerd', (done) => {
+  
+      chai.request(server)
+          .post(endpointToTest)
+          .send({
+              firstName: 'firstnametest',
+              lastName: 'lastnametest',
+              isActive: 1,
+              emailAdress: 'f.registertest@server.com',
+              password: 'Secret1234',
+              phoneNumber: '0612425495',
+              roles: 'editor,guest',
+              street: '',
+              city: ''
+          })
+          .end((err, res) => {
+              if (err) {
+                  console.error('Error registering user:', err);
+              } 
+              res.should.have.status(200);
+              res.body.should.be.a('object');
+  
+              res.body.should.have.property('data').that.is.a('object');
+              res.body.should.have.property('message').that.is.a('string');
+              
+              const data = res.body.data;
+              data.should.have.property('firstName').equals('firstnametest');
+              data.should.have.property('lastName').equals('lastnametest');
+              data.should.have.property('emailAdress');
+              data.should.have.property('id').that.is.a('number');
+              data.should.have.property('isActive').equals(1);
+              data.should.have.property('phoneNumber').equals('0612425495');
+              data.should.have.property('roles').equals('editor,guest');
+              data.should.have.property('password').equals('Secret1234');
 
-                res.body.should.have.property('data').that.is.a('object')
-                res.body.should.have.property('message').that.is.a('string')
-
-                const data = res.body.data
-                data.should.have.property('firstName').equals('firstnametest')
-                data.should.have.property('lastName').equals('lastnametest')
-                data.should.have.property('emailAdress')
-                data.should.have.property('id').that.is.a('number')
-                data.should.have.property('isActive').equals(1)
-                data.should.have.property('phoneNumber').equals('0612425495')
-                data.should.have.property('roles').equals('editor,guest')
-                data.should.have.property('password').equals('Secret1234')
-
-                // Delete the registered user
-                chai.request(server)
-                    .delete(endpointToTest + '/' + data.id)
-                    .end((err, res) => {
-                        res.should.have.status(200)
-                        done()
-                    })
-            })
-    })
+              const token = jwt.sign({ id: data.id }, jwtSecretKey, { expiresIn: '1h' });
+  
+              // Delete the registered user
+              chai.request(server)
+                  .delete(endpointToTest + '/' + data.id)
+                  .set('Authorization', `Bearer ${token}`)
+                  .end((err, res) => {
+                      if (err) {
+                          console.error('Error deleting user:', err);
+                      } 
+  
+                      res.should.have.status(200);
+                      done();
+                  });
+          });
+  });
 })
   
 describe('UC202 Opvragen van een overzicht van alle users', () => {
