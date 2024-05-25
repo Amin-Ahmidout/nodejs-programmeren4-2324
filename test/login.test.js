@@ -43,7 +43,7 @@ describe('UC101 Inloggen', () => {
         const testUser = {
             firstName: 'John',
             lastName: 'Doe',
-            emailAdress: 'test@example.com',
+            emailAdress: 't.testeneeee@example.com',
             password: 123456, // Invalid password type (not a string)
             street: 'Mainstreet',
             city: 'New York',
@@ -73,7 +73,7 @@ describe('UC101 Inloggen', () => {
         chai.request(server)
             .post('/api/login')
             .send({
-                emailAdress: 'nonexisting@example.com',
+                emailAdress: 'n.notexisting@example.com',
                 password: 'Secret123456'
             })
             .end((err, res) => {
@@ -95,7 +95,7 @@ describe('UC101 Inloggen', () => {
         const testUser = {
             firstName: 'John',
             lastName: 'Doe',
-            emailAdress: 't.testtt@example.com',
+            emailAdress: 't.testen@example.com',
             password: 'Secret123456',
             street: 'Mainstreet',
             city: 'New York',
