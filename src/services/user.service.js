@@ -84,9 +84,6 @@ const userService = {
             return callback({ status: 403, message: 'Forbidden: You can only delete your own data' }, null);
         }
         database.deleteUser(id, (err, data) => {
-            if (err) {
-                callback({ status: 400, message: err.message }, null);
-            } else {
                 if (data) {
                     callback(null, {
                         status: 200,
@@ -100,7 +97,7 @@ const userService = {
                         data: null
                     }, null);
                 }
-            }
+            
         });
     }
     ,

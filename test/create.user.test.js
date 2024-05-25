@@ -656,23 +656,32 @@ describe('UC-206 Verwijderen van een user', () => {
       done()
     })
 
-    it.skip('TC-206-1 Gebruiker bestaat niet', (done) => {
-      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
-      const nonExistentUserId = 999 // ID of a non-existent user
-
+    it('TC-206-1 Gebruiker bestaat niet', (done) => {
+      console.log('Test started');
+  
+      const token = jwt.sign({ id: 999 }, jwtSecretKey, { expiresIn: '1h' });
+      const nonExistentUserId = 999; // ID of a non-existent user
+  
       chai.request(server)
-        .delete(`/api/user/${nonExistentUserId}`)
-        .set('Authorization', `Bearer ${token}`)
-        .send({ firstName: 'Updated' })
-        .end((err, res) => {
-          expect(res).to.have.status(403)
-          expect(res.body).to.be.an('object')
-          expect(res.body).to.have.property('message').that.is.a('string')
-          expect(res.body.message).to.equal(`User with ID ${nonExistentUserId} not found`)
-          expect(res.body).to.have.property('data').that.is.empty
-          done()
-        })
-    })
+          .delete(`/api/user/${nonExistentUserId}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({ firstName: 'Updated' })
+          .end((err, res) => {
+              if (err) {
+                  console.error('Error deleting non-existent user:', err);
+              } else {
+                  console.log('Delete non-existent user response:', res.body);
+              }
+  
+              expect(res).to.have.status(404);
+              expect(res.body).to.be.an('object');
+              expect(res.body).to.have.property('message').that.is.a('string');
+              expect(res.body.message).to.equal(`User not found with id ${nonExistentUserId}.`);
+              expect(res.body).to.have.property('data').that.is.empty;
+              done();
+          });
+  });
+  
 
     it('TC-206-2 Gebruiker is niet ingelogd', (done) => {
       chai.request(server)
