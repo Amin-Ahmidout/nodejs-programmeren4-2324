@@ -23,7 +23,7 @@ describe('UC301 toevoegen van maaltijd', () => {
 
 
     it.skip('TC-301-1 Verplicht veld ontbreekt', (done) => {
-
+        
     })
 
     
@@ -35,8 +35,18 @@ describe('UC301 toevoegen van maaltijd', () => {
       
     })
 
-    it.skip('TC-303-1 Lijst van maaltijden geretourneerd', (done) => {
-            
+    it('TC-303-1 Lijst van maaltijden geretourneerd', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
+        chai.request(server)
+            .get(endpointToTest)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                res.should.have.status(200)
+                res.body.should.be.an('object')
+                res.body.should.have.property('data').that.is.an('array')
+
+                done()
+            })
     })
 
     it.skip('TC-304-1 Maaltijd bestaat niet', (done) => {
