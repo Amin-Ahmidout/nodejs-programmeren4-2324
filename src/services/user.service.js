@@ -51,8 +51,11 @@ const userService = {
             }
         })
     },
-
-    updateUser: (id, updatedUser, callback) => {
+    updateUser: (id, updatedUser, authUserId, callback) => {
+        console.log(`authUserId: ${authUserId}, id: ${id}`); // Log the IDs for debugging
+        if (parseInt(id) !== parseInt(authUserId)) {
+            return callback({ status: 403, message: 'Forbidden: You can only update your own data' }, null);
+        }
         database.updateUser(id, updatedUser, (err, data) => {
             if (err) {
                 callback({ status: 400, message: err.message }, null);
@@ -72,7 +75,9 @@ const userService = {
                 }
             }
         });
-    },
+    }
+    
+    ,
     
 
     delete: (id, callback) => {
