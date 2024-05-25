@@ -583,8 +583,7 @@ describe('UC-205 Wijzigen van usergegevens', () => {
         })
     })
 
-    it.skip('TC-205-6 Gebruiker succesvol gewijzigd', (done) => {
-      const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+    it('TC-205-6 Gebruiker succesvol gewijzigd', (done) => {
       const testUser = {
         firstName: 'John',
         lastName: 'Doe',
@@ -606,13 +605,13 @@ describe('UC-205 Wijzigen van usergegevens', () => {
           expect(res.body.data).to.have.property('id').that.is.a('number');
     
           const userId = res.body.data.id;
-    
+          const userToken = jwt.sign({ id: userId }, jwtSecretKey, { expiresIn: '1h' });
           expect(res.body.message).to.equal(`User created with id ${userId}.`);
     
           // Update the user's data
           chai.request(server)
             .put(`/api/user/${userId}`)
-            .set('Authorization', `Bearer ${token}`)
+            .set('Authorization', `Bearer ${userToken}`)
             .send({ firstName: 'Updated', emailAdress: 't.testen@example.com'})
             .end((err, res) => {
               if (err) {
@@ -636,7 +635,7 @@ describe('UC-205 Wijzigen van usergegevens', () => {
               // Delete the user
               chai.request(server)
                 .delete(`/api/user/${userId}`)
-                .set('Authorization', `Bearer ${token}`)
+                .set('Authorization', `Bearer ${userToken}`)
                 .end((err, res) => {
                   res.should.have.status(200);
                   expect(res.body).to.be.an('object');
