@@ -13,10 +13,6 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/meal'
 
 describe('UC301 toevoegen van maaltijd', () => {
-    /**
-     * Voorbeeld van een beforeEach functie.
-     * Hiermee kun je code hergebruiken of initialiseren.
-     */
     beforeEach((done) => {
         done()
     })
@@ -34,7 +30,12 @@ describe('UC301 toevoegen van maaltijd', () => {
     it.skip('TC-301-3 Maaltijd succesvol toegevoegd', (done) => {
       
     })
+})
 
+describe ('UC-303 opvragen van maaltijden', () => {
+    beforeEach((done) => {
+        done()
+    }) 
     it('TC-303-1 Lijst van maaltijden geretourneerd', (done) => {
         const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
         chai.request(server)
@@ -48,6 +49,12 @@ describe('UC301 toevoegen van maaltijd', () => {
                 done()
             })
     })
+})
+
+describe('UC-304 opvragen van maaltijd bij ID', () => {
+    beforeEach((done) => {
+        done()
+    })
 
     it.skip('TC-304-1 Maaltijd bestaat niet', (done) => {
 
@@ -56,7 +63,9 @@ describe('UC301 toevoegen van maaltijd', () => {
     it.skip('TC-304-2 details van maaltijd geretourneerd', (done) => {
 
     })
+})
 
+describe('UC-305 verwijderen van een maaltijd', () => {
     it.skip('TC-305-1 niet ingelogd', (done) => {
 
     })
@@ -72,7 +81,7 @@ describe('UC301 toevoegen van maaltijd', () => {
     it.skip('TC-305-4 maaltijd succesvol bijgewerkt', (done) => {
 
     })
-
+})
 
 
 
@@ -89,4 +98,3 @@ describe('UC301 toevoegen van maaltijd', () => {
 
 
     
-})
