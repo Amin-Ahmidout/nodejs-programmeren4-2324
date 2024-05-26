@@ -11,17 +11,26 @@ const { validateToken } = require('./auth.routes')
 
 
 function validateMissingMealFields(req, res, next) {
-    const { price, name, description } = req.body;
-    if (!price || !name || !description) {
-        return res.status(400).json({
-            status: 400,
-            message: 'Missing meal fields',
-            data: {}
-        });
-    }
-    next();
+  const { price, name, description } = req.body;
+  const missingFields = [];
+  if (!price) {
+    missingFields.push('price');
+  }
+  if (!name) {
+    missingFields.push('name');
+  }
+  if (!description) {
+    missingFields.push('description');
+  }
+  if (missingFields.length > 0) {
+    return res.status(400).json({
+      status: 400,
+      message: `Missing required field(s): ${missingFields.join(', ')}`,
+      data: {}
+    });
+  }
+  next();
 };
-
 function validateMeal(req, res, next) {
     const {
       name,
