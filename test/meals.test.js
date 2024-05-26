@@ -58,9 +58,39 @@ describe('UC301 toevoegen van maaltijd', () => {
     
 
     
-    it.skip('TC-301-2 Gebruiker is niet ingelogd', (done) => {
-           
-    })
+    it('TC-301-2 Gebruiker is niet ingelogd', (done) => {
+        const mealData = {
+            name: 'Pasta Bolognese',
+            description: 'Heerlijke pasta met bolognesesaus',
+            price: 8.50,
+            dateTime: '2024-05-26 18:00:00',
+            maxAmountOfParticipants: 10,
+            imageUrl: 'https://example.com/image.jpg',
+            isActive: true,
+            isVega: false,
+            isVegan: false,
+            isToTakeHome: true,
+            allergenes: 'gluten'
+        };
+    
+        chai.request(server)
+            .post('/api/meal')
+            .send(mealData)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating meal:', err);
+                } 
+    
+                
+                expect(res).to.have.status(401);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('message').that.is.a('string');
+                expect(res.body.message).to.equal('No token provided!');
+                expect(res.body).to.have.property('data').that.is.empty;
+                done();
+            });
+    });
+    
     
     it('TC-301-3 Maaltijd succesvol aangemaakt', (done) => {
         const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
