@@ -22,23 +22,23 @@ let mealController = {
     },
 
     getMealById: (req, res, next) => {
-        const mealId = parseInt(req.params.mealId, 10)
+        const mealId = parseInt(req.params.mealId, 10);
         mealService.getMealById(mealId, (error, success) => {
             if (error) {
-                return next({
-                    status: error.status,
+                return res.status(error.status || 500).json({
+                    status: error.status || 500,
                     message: error.message,
                     data: {}
-                })
+                });
             }
             if (success) {
                 res.status(200).json({
                     status: 200,
                     message: success.message,
                     data: success.data
-                })
+                });
             }
-        })
+        });
     },
 
     deleteMeal: (req, res, next) => {

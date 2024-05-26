@@ -20,21 +20,21 @@ const mealService = {
     getMealById: (id, callback) => {
         database.getMealById(id, (err, data) => {
             if (err) {
-                callback(err, null)
+                callback(err, null);
             } else {
                 if (data) {
                     callback(null, {
                         message: `Found meal with ID ${id}.`,
                         data: data
-                    })
+                    });
                 } else {
-                    callback(null, {
-                        message: `Meal with ID ${id} not found.`,
-                        data: null
-                    })
+                    callback({
+                        status: 404,
+                        message: `Meal with ID ${id} not found.`
+                    }, null);
                 }
             }
-        })
+        });
     },
 
     deleteMeal: (id, callback) => {

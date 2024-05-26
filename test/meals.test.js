@@ -162,9 +162,31 @@ describe('UC-304 opvragen van maaltijd bij ID', () => {
         done()
     })
 
-    it.skip('TC-304-1 Maaltijd bestaat niet', (done) => {
-
-    })
+    it('TC-304-1 Maaltijd bestaat niet', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+        const nonExistentMealId = 99999; // ID van een niet-bestaande maaltijd
+    
+        chai.request(server)
+            .get(`/api/meal/${nonExistentMealId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error retrieving meal:', err);
+                    return done(err);
+                }
+    
+                // We verwachten een 404 status omdat de maaltijd niet bestaat
+                expect(res).to.have.status(404);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('message').that.is.a('string');
+                expect(res.body.message).to.equal(`Meal with ID ${nonExistentMealId} not found.`);
+                expect(res.body).to.have.property('data').that.is.empty;
+    
+                done();
+            });
+    });
+    
+    
 
     it('TC-304-2 Gegevens succesvol geretourneerd', (done) => {
         const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
