@@ -27,9 +27,35 @@ describe('UC301 toevoegen van maaltijd', () => {
            
     })
     
-    it.skip('TC-301-3 Maaltijd succesvol toegevoegd', (done) => {
-      
-    })
+    it('TC-301-3 Maaltijd succesvol aangemaakt', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+        
+        const mealData = {
+            name: 'Pasta Bolognese',
+            description: 'Heerlijke pasta met bolognesesaus',
+            price: 8.50,
+            dateTime: '2024-05-26 18:00:00',
+            maxAmountOfParticipants: 10,
+            imageUrl: 'https://example.com/image.jpg'
+        };
+    
+        chai.request(server)
+            .post('/api/meal')
+            .set('Authorization', `Bearer ${token}`)
+            .send(mealData)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating meal:', err);
+                } 
+    
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('data').that.is.an('object');
+                expect(res.body.data).to.have.property('cookId').that.equals(1);
+                done();
+            });
+    });
+    
 })
 
 describe ('UC-303 opvragen van maaltijden', () => {
