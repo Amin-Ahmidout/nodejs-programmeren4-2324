@@ -364,643 +364,376 @@ describe('UC202 Opvragen van een overzicht van alle users', () => {
                             })
                     })
             })
+    })
+})
 
-        describe('UC203 Opvragen van een gebruikersprofiel', () => {
-            beforeEach((done) => {
+describe('UC203 Opvragen van een gebruikersprofiel', () => {
+    it('TC-203-1 ongeldig token', (done) => {
+        chai.request(server)
+            .get('/api/user/profile')
+            .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
+            .end((err, res) => {
+                expect(res).to.have.status(401)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal('Token invalid!') // Updated to match actual message
+                expect(res.body).to.have.property('data').that.is.an('object')
+                    .that.is.empty // Adjusted expectation
                 done()
             })
+    })
 
-            it('TC-203-1 ongeldig token', (done) => {
-                chai.request(server)
-                    .get('/api/user/profile')
-                    .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
-                    .end((err, res) => {
-                        expect(res).to.have.status(401)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal('Token invalid!') // Updated to match actual message
-                        expect(res.body)
-                            .to.have.property('data')
-                            .that.is.an('object').that.is.empty // Adjusted expectation
-                        done()
-                    })
-            })
-
-            it('TC-203-2 Gebruiker is ingelogd met geldig token', (done) => {
-                // Generate a valid token for authentication
-                const token = jwt.sign({ id: 1 }, jwtSecretKey, {
-                    expiresIn: '1h'
-                })
-
-                chai.request(server)
-                    .get('/api/user/profile')
-                    .set('Authorization', `Bearer ${token}`)
-                    .end((err, res) => {
-                        expect(res).to.have.status(200)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('data')
-                            .that.is.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            'Profile found for user with id 1.'
-                        )
-                        done()
-                    })
-            })
+    it('TC-203-2 Gebruiker is ingelogd met geldig token', (done) => {
+        // Generate a valid token for authentication
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, {
+            expiresIn: '1h'
         })
 
-        describe('UC-204 Opvragen van usergegevens bij ID', () => {
-            beforeEach((done) => {
+        chai.request(server)
+            .get('/api/user/profile')
+            .set('Authorization', `Bearer ${token}`)
+            .end((err, res) => {
+                expect(res).to.have.status(200)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('data').that.is.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(
+                    'Profile found for user with id 1.'
+                )
                 done()
             })
+    })
+})
 
-            it('TC-204-1 Ongeldig token', (done) => {
-                chai.request(server)
-                    .get('/api/user/:userId')
-                    .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
-                    .end((err, res) => {
-                        expect(res).to.have.status(401)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal('Token invalid!') // Updated to match actual message
-                        expect(res.body)
-                            .to.have.property('data')
-                            .that.is.an('object').that.is.empty // Adjusted expectation
-                        done()
-                    })
+describe('UC-204 Opvragen van usergegevens bij ID', () => {
+    beforeEach((done) => {
+        done()
+    })
+
+    it('TC-204-1 Ongeldig token', (done) => {
+        chai.request(server)
+            .get('/api/user/:userId')
+            .set('Authorization', 'Bearer invalidtoken') // Set an invalid token
+            .end((err, res) => {
+                expect(res).to.have.status(401)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal('Token invalid!') // Updated to match actual message
+                expect(res.body).to.have.property('data').that.is.an('object')
+                    .that.is.empty // Adjusted expectation
+                done()
             })
+    })
 
-            it('TC-204-2 Gebruiker-ID bestaat niet', (done) => {
-                const nonExistentUserId = 9999 // ID of a non-existent user
-                const token = jwt.sign({ id: 139 }, jwtSecretKey, {
-                    expiresIn: '1h'
-                })
-
-                chai.request(server)
-                    .get(`/api/user/${nonExistentUserId}`)
-                    .set('Authorization', `Bearer ${token}`) // Set a valid token
-                    .end((err, res) => {
-                        console.log(nonExistentUserId)
-                        console.log(res.body)
-                        expect(res.body).to.have.status(404)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            `User not found with id ${nonExistentUserId}.`
-                        )
-                        expect(res.body).to.have.property('data').that.is.null
-                        done()
-                    })
-            })
-
-            it('TC-204-3 Gebruiker-ID bestaat', (done) => {
-                const existingUserId = 1 // ID of an existing user
-                const token = jwt.sign({ id: existingUserId }, jwtSecretKey, {
-                    expiresIn: '1h'
-                })
-
-                chai.request(server)
-                    .get(`/api/user/${existingUserId}`)
-                    .set('Authorization', `Bearer ${token}`) // Set a valid token
-                    .end((err, res) => {
-                        expect(res).to.have.status(200)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('data')
-                            .that.is.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            `User found with id ${existingUserId}.`
-                        )
-                        done()
-                    })
-            })
+    it('TC-204-2 Gebruiker-ID bestaat niet', (done) => {
+        const nonExistentUserId = 9999 // ID of a non-existent user
+        const token = jwt.sign({ id: 139 }, jwtSecretKey, {
+            expiresIn: '1h'
         })
 
-        describe('UC-205 Wijzigen van usergegevens', () => {
-            beforeEach((done) => {
+        chai.request(server)
+            .get(`/api/user/${nonExistentUserId}`)
+            .set('Authorization', `Bearer ${token}`) // Set a valid token
+            .end((err, res) => {
+                console.log(nonExistentUserId)
+                console.log(res.body)
+                expect(res.body).to.have.status(404)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(
+                    `User not found with id ${nonExistentUserId}.`
+                )
+                expect(res.body).to.have.property('data').that.is.null
                 done()
             })
+    })
 
-            it('TC-205-1 Verplicht veld emailAdress ontbreekt', (done) => {
-                const token = jwt.sign({ id: 1 }, jwtSecretKey, {
-                    expiresIn: '1h'
-                })
-                const testUser = {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    password: 'Secret1234',
-                    street: 'Mainstreet',
-                    city: 'New York',
-                    roles: 'editor,guest'
-                }
-
-                chai.request(server)
-                    .put('/api/user/:userId')
-                    .set('Authorization', `Bearer ${token}`)
-                    .send(testUser)
-                    .end((err, res) => {
-                        expect(res).to.have.status(400)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            'Invalid email address'
-                        )
-                        expect(res.body).to.have.property('data').that.is.empty
-                        done()
-                    })
-            })
-
-            it('TC-205-2 De gebruiker is niet de eigenaar van de data', (done) => {
-                const testUser = {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    emailAdress: 't.testssssss@example.com',
-                    password: 'Secret1234',
-                    street: 'Mainstreet',
-                    city: 'New York',
-                    roles: 'editor,guest'
-                }
-
-                // Create a new user
-                chai.request(server)
-                    .post('/api/user')
-                    .send(testUser)
-                    .end((err, res) => {
-                        if (err) {
-                            console.error('Error creating user:', err)
-                        }
-
-                        expect(res).to.have.status(200)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('data')
-                            .that.is.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            `User created with id ${res.body.data.id}.`
-                        )
-
-                        const userId = res.body.data.id
-
-                        // Attempt to update the user's data with a different user's token
-                        const otherUserId = 2 // ID of another user
-                        const otherUserToken = jwt.sign(
-                            { id: otherUserId },
-                            jwtSecretKey,
-                            { expiresIn: '1h' }
-                        )
-                        const userToken = jwt.sign(
-                            { id: userId },
-                            jwtSecretKey,
-                            {
-                                expiresIn: '1h'
-                            }
-                        )
-                        chai.request(server)
-                            .put(`/api/user/${userId}`)
-                            .set('Authorization', `Bearer ${otherUserToken}`)
-                            .send({
-                                firstName: 'Updated',
-                                emailAdress: 't.testssssss@example.com'
-                            })
-                            .end((err, res) => {
-                                if (err) {
-                                    console.error(
-                                        'Error updating user data:',
-                                        err
-                                    )
-                                }
-
-                                expect(res).to.have.status(403)
-                                expect(res.body).to.be.an('object')
-                                expect(res.body)
-                                    .to.have.property('message')
-                                    .that.is.a('string')
-                                expect(res.body.message).to.equal(
-                                    'Forbidden: You can only update your own data'
-                                )
-                                expect(res.body).to.have.property('data').that
-                                    .is.empty
-
-                                // Delete the test user
-                                chai.request(server)
-                                    .delete(`/api/user/${userId}`)
-                                    .set('Authorization', `Bearer ${userToken}`)
-                                    .end((err, res) => {
-                                        if (err) {
-                                            console.error(
-                                                'Error deleting user:',
-                                                err
-                                            )
-                                        }
-
-                                        expect(res).to.have.status(200)
-                                        expect(res.body).to.be.an('object')
-                                        expect(res.body)
-                                            .to.have.property('message')
-                                            .that.is.a('string')
-                                        expect(res.body.message).to.equal(
-                                            `User deleted with id ${userId}.`
-                                        )
-                                        done()
-                                    })
-                            })
-                    })
-            })
-
-            it('TC-205-3 Niet valide telefoonnummer', (done) => {
-                const token = jwt.sign({ id: 1 }, jwtSecretKey, {
-                    expiresIn: '1h'
-                })
-                const testUser = {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    emailAdress: 't.test@example.com',
-                    password: 'Secret1234',
-                    phoneNumber: '123456789', // Invalid phone number
-                    street: 'Mainstreet',
-                    city: 'New York',
-                    roles: 'editor,guest'
-                }
-
-                chai.request(server)
-                    .put('/api/user/:userId')
-                    .set('Authorization', `Bearer ${token}`)
-                    .send(testUser)
-                    .end((err, res) => {
-                        expect(res).to.have.status(400)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            'Invalid phone number. Phone number must start with 06 and have 10 digits.'
-                        )
-                        expect(res.body).to.have.property('data').that.is.empty
-                        done()
-                    })
-            })
-
-            it('TC-205-4 Gebruiker bestaat niet', (done) => {
-                const token = jwt.sign({ id: 1 }, jwtSecretKey, {
-                    expiresIn: '1h'
-                })
-                const nonExistentUserId = 999 // ID of a non-existent user
-
-                chai.request(server)
-                    .put(`/api/user/${nonExistentUserId}`)
-                    .set('Authorization', `Bearer ${token}`)
-                    .send({ firstName: 'Updated' })
-                    .end((err, res) => {
-                        expect(res).to.have.status(400)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            `Invalid email address`
-                        )
-                        expect(res.body).to.have.property('data').that.is.empty
-                        done()
-                    })
-            })
-
-            it('TC-205-5 Niet ingelogd', (done) => {
-                chai.request(server)
-                    .put('/api/user/:userId')
-                    .send({ firstName: 'Updated' })
-                    .end((err, res) => {
-                        expect(res).to.have.status(400)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            'Invalid email address'
-                        )
-                        expect(res.body).to.have.property('data').that.is.empty
-                        done()
-                    })
-            })
-
-            it('TC-205-6 Gebruiker succesvol gewijzigd', (done) => {
-                const testUser = {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    emailAdress: 't.testen@example.com',
-                    password: 'Secret1234',
-                    phoneNumber: '0612345678',
-                    street: 'Mainstreet',
-                    city: 'New York',
-                    roles: 'editor,guest'
-                }
-
-                // Create a new user
-                chai.request(server)
-                    .post('/api/user')
-                    .send(testUser)
-                    .end((err, res) => {
-                        res.should.have.status(200)
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.data)
-                            .to.have.property('id')
-                            .that.is.a('number')
-
-                        const userId = res.body.data.id
-                        const userToken = jwt.sign(
-                            { id: userId },
-                            jwtSecretKey,
-                            {
-                                expiresIn: '1h'
-                            }
-                        )
-                        expect(res.body.message).to.equal(
-                            `User created with id ${userId}.`
-                        )
-
-                        // Update the user's data
-                        chai.request(server)
-                            .put(`/api/user/${userId}`)
-                            .set('Authorization', `Bearer ${userToken}`)
-                            .send({
-                                firstName: 'Updated',
-                                emailAdress: 't.testen@example.com'
-                            })
-                            .end((err, res) => {
-                                if (err) {
-                                    console.error('Error:', err)
-                                }
-
-                                res.should.have.status(200) // Expected status code
-                                expect(res.body).to.be.an('object')
-                                expect(res.body)
-                                    .to.have.property('message')
-                                    .that.is.a('string')
-                                expect(res.body.message).to.equal(
-                                    `User with id ${userId} successfully updated.`
-                                )
-                                expect(res.body)
-                                    .to.have.property('data')
-                                    .that.is.an('object')
-                                expect(res.body.data).to.have.property('id')
-                                expect(res.body.data)
-                                    .to.have.property('firstName')
-                                    .that.is.a('string')
-                                    .that.equals('Updated')
-                                expect(res.body.data)
-                                    .to.have.property('lastName')
-                                    .that.is.a('string')
-                                    .that.equals('Doe')
-                                expect(res.body.data)
-                                    .to.have.property('emailAdress')
-                                    .that.is.a('string')
-                                    .that.equals('t.testen@example.com')
-                                expect(res.body.data)
-                                    .to.have.property('phoneNumber')
-                                    .that.is.a('string')
-                                    .that.equals('0612345678')
-                                expect(res.body.data)
-                                    .to.have.property('street')
-                                    .that.is.a('string')
-                                    .that.equals('Mainstreet')
-                                expect(res.body.data)
-                                    .to.have.property('city')
-                                    .that.is.a('string')
-                                    .that.equals('New York')
-                                expect(res.body.data)
-                                    .to.have.property('roles')
-                                    .that.is.a('string')
-                                    .that.equals('editor,guest')
-
-                                // Delete the user
-                                chai.request(server)
-                                    .delete(`/api/user/${userId}`)
-                                    .set('Authorization', `Bearer ${userToken}`)
-                                    .end((err, res) => {
-                                        res.should.have.status(200)
-                                        expect(res.body).to.be.an('object')
-                                        expect(res.body)
-                                            .to.have.property('message')
-                                            .that.is.a('string')
-                                        expect(res.body.message).to.equal(
-                                            `User deleted with id ${userId}.`
-                                        )
-                                        done()
-                                    })
-                            })
-                    })
-            })
+    it('TC-204-3 Gebruiker-ID bestaat', (done) => {
+        const existingUserId = 1 // ID of an existing user
+        const token = jwt.sign({ id: existingUserId }, jwtSecretKey, {
+            expiresIn: '1h'
         })
 
-        describe('UC-206 Verwijderen van een user', () => {
-            beforeEach((done) => {
+        chai.request(server)
+            .get(`/api/user/${existingUserId}`)
+            .set('Authorization', `Bearer ${token}`) // Set a valid token
+            .end((err, res) => {
+                expect(res).to.have.status(200)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('data').that.is.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(
+                    `User found with id ${existingUserId}.`
+                )
                 done()
             })
+    })
+})
 
-            it('TC-206-1 Gebruiker bestaat niet', (done) => {
-                console.log('Test started')
+describe('UC-205 Wijzigen van usergegevens', () => {
+    beforeEach((done) => {
+        done()
+    })
 
-                const token = jwt.sign({ id: 999 }, jwtSecretKey, {
-                    expiresIn: '1h'
-                })
-                const nonExistentUserId = 999 // ID of a non-existent user
+    it('TC-205-1 Verplicht veld emailAdress ontbreekt', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, {
+            expiresIn: '1h'
+        })
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            password: 'Secret1234',
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
 
-                chai.request(server)
-                    .delete(`/api/user/${nonExistentUserId}`)
-                    .set('Authorization', `Bearer ${token}`)
-                    .send({ firstName: 'Updated' })
-                    .end((err, res) => {
-                        if (err) {
-                            console.error(
-                                'Error deleting non-existent user:',
-                                err
-                            )
-                        } else {
-                            console.log(
-                                'Delete non-existent user response:',
-                                res.body
-                            )
-                        }
-
-                        expect(res).to.have.status(404)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal(
-                            `User not found with id ${nonExistentUserId}.`
-                        )
-                        expect(res.body).to.have.property('data').that.is.empty
-                        done()
-                    })
+        chai.request(server)
+            .put('/api/user/:userId')
+            .set('Authorization', `Bearer ${token}`)
+            .send(testUser)
+            .end((err, res) => {
+                expect(res).to.have.status(400)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal('Invalid email address')
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
             })
+    })
 
-            it('TC-206-2 Gebruiker is niet ingelogd', (done) => {
-                chai.request(server)
-                    .delete('/api/user/:userId')
-                    .send({ firstName: 'Updated' })
-                    .end((err, res) => {
-                        expect(res).to.have.status(401)
-                        expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('message')
-                            .that.is.a('string')
-                        expect(res.body.message).to.equal('No token provided!')
-                        expect(res.body).to.have.property('data').that.is.empty
-                        done()
-                    })
-            })
+    it('TC-205-2 De gebruiker is niet de eigenaar van de data', (done) => {
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 't.testssssss@example.com',
+            password: 'Secret1234',
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
 
-            it('TC-206-3 Gebruiker is niet de eigenaar van de data', (done) => {
-                const testUser = {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    emailAdress: 't.testssssss@example.com',
-                    password: 'Secret1234',
-                    street: 'Mainstreet',
-                    city: 'New York',
-                    roles: 'editor,guest'
+        // Create a new user
+        chai.request(server)
+            .post('/api/user')
+            .send(testUser)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating user:', err)
                 }
 
-                // Create a new user
+                expect(res).to.have.status(200)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('data').that.is.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(
+                    `User created with id ${res.body.data.id}.`
+                )
+
+                const userId = res.body.data.id
+
+                // Attempt to update the user's data with a different user's token
+                const otherUserId = 2 // ID of another user
+                const otherUserToken = jwt.sign(
+                    { id: otherUserId },
+                    jwtSecretKey,
+                    { expiresIn: '1h' }
+                )
+                const userToken = jwt.sign({ id: userId }, jwtSecretKey, {
+                    expiresIn: '1h'
+                })
                 chai.request(server)
-                    .post('/api/user')
-                    .send(testUser)
+                    .put(`/api/user/${userId}`)
+                    .set('Authorization', `Bearer ${otherUserToken}`)
+                    .send({
+                        firstName: 'Updated',
+                        emailAdress: 't.testssssss@example.com'
+                    })
                     .end((err, res) => {
                         if (err) {
-                            console.error('Error creating user:', err)
+                            console.error('Error updating user data:', err)
                         }
 
-                        expect(res).to.have.status(200)
+                        expect(res).to.have.status(403)
                         expect(res.body).to.be.an('object')
-                        expect(res.body)
-                            .to.have.property('data')
-                            .that.is.an('object')
                         expect(res.body)
                             .to.have.property('message')
                             .that.is.a('string')
                         expect(res.body.message).to.equal(
-                            `User created with id ${res.body.data.id}.`
+                            'Forbidden: You can only update your own data'
                         )
+                        expect(res.body).to.have.property('data').that.is.empty
 
-                        const userId = res.body.data.id
-
-                        // Attempt to update the user's data with a different user's token
-                        const otherUserId = 2 // ID of another user
-                        const otherUserToken = jwt.sign(
-                            { id: otherUserId },
-                            jwtSecretKey,
-                            { expiresIn: '1h' }
-                        )
-                        const userToken = jwt.sign(
-                            { id: userId },
-                            jwtSecretKey,
-                            {
-                                expiresIn: '1h'
-                            }
-                        )
+                        // Delete the test user
                         chai.request(server)
                             .delete(`/api/user/${userId}`)
-                            .set('Authorization', `Bearer ${otherUserToken}`)
+                            .set('Authorization', `Bearer ${userToken}`)
                             .end((err, res) => {
                                 if (err) {
-                                    console.error(
-                                        'Error updating user data:',
-                                        err
-                                    )
+                                    console.error('Error deleting user:', err)
                                 }
 
-                                expect(res).to.have.status(403)
+                                expect(res).to.have.status(200)
                                 expect(res.body).to.be.an('object')
                                 expect(res.body)
                                     .to.have.property('message')
                                     .that.is.a('string')
                                 expect(res.body.message).to.equal(
-                                    'Forbidden: You can only delete your own data'
+                                    `User deleted with id ${userId}.`
                                 )
-                                expect(res.body).to.have.property('data').that
-                                    .is.empty
-
-                                // Delete the test user
-                                chai.request(server)
-                                    .delete(`/api/user/${userId}`)
-                                    .set('Authorization', `Bearer ${userToken}`)
-                                    .end((err, res) => {
-                                        if (err) {
-                                            console.error(
-                                                'Error deleting user:',
-                                                err
-                                            )
-                                        }
-
-                                        expect(res).to.have.status(200)
-                                        expect(res.body).to.be.an('object')
-                                        expect(res.body)
-                                            .to.have.property('message')
-                                            .that.is.a('string')
-                                        expect(res.body.message).to.equal(
-                                            `User deleted with id ${userId}.`
-                                        )
-                                        done()
-                                    })
+                                done()
                             })
                     })
             })
+    })
 
-            it('TC-206-4 Gebruiker succesvol verwijderd', (done) => {
-                const testUser = {
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    emailAdress: 't.testen@example.com',
-                    password: 'Secret1234',
-                    phoneNumber: '0612345678',
-                    street: 'Mainstreet',
-                    city: 'New York',
-                    roles: 'editor,guest'
-                }
+    it('TC-205-3 Niet valide telefoonnummer', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, {
+            expiresIn: '1h'
+        })
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 't.test@example.com',
+            password: 'Secret1234',
+            phoneNumber: '123456789', // Invalid phone number
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
 
-                // Create a new user
+        chai.request(server)
+            .put('/api/user/:userId')
+            .set('Authorization', `Bearer ${token}`)
+            .send(testUser)
+            .end((err, res) => {
+                expect(res).to.have.status(400)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(
+                    'Invalid phone number. Phone number must start with 06 and have 10 digits.'
+                )
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
+
+    it('TC-205-4 Gebruiker bestaat niet', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, {
+            expiresIn: '1h'
+        })
+        const nonExistentUserId = 999 // ID of a non-existent user
+
+        chai.request(server)
+            .put(`/api/user/${nonExistentUserId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ firstName: 'Updated' })
+            .end((err, res) => {
+                expect(res).to.have.status(400)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(`Invalid email address`)
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
+
+    it('TC-205-5 Niet ingelogd', (done) => {
+        chai.request(server)
+            .put('/api/user/:userId')
+            .send({ firstName: 'Updated' })
+            .end((err, res) => {
+                expect(res).to.have.status(400)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal('Invalid email address')
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
+
+    it('TC-205-6 Gebruiker succesvol gewijzigd', (done) => {
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 't.testen@example.com',
+            password: 'Secret1234',
+            phoneNumber: '0612345678',
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
+
+        // Create a new user
+        chai.request(server)
+            .post('/api/user')
+            .send(testUser)
+            .end((err, res) => {
+                res.should.have.status(200)
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.data).to.have.property('id').that.is.a('number')
+
+                const userId = res.body.data.id
+                const userToken = jwt.sign({ id: userId }, jwtSecretKey, {
+                    expiresIn: '1h'
+                })
+                expect(res.body.message).to.equal(
+                    `User created with id ${userId}.`
+                )
+
+                // Update the user's data
                 chai.request(server)
-                    .post('/api/user')
-                    .send(testUser)
+                    .put(`/api/user/${userId}`)
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .send({
+                        firstName: 'Updated',
+                        emailAdress: 't.testen@example.com'
+                    })
                     .end((err, res) => {
-                        res.should.have.status(200)
+                        if (err) {
+                            console.error('Error:', err)
+                        }
+
+                        res.should.have.status(200) // Expected status code
+                        expect(res.body).to.be.an('object')
                         expect(res.body)
                             .to.have.property('message')
                             .that.is.a('string')
-                        expect(res.body.data)
-                            .to.have.property('id')
-                            .that.is.a('number')
-
-                        const userId = res.body.data.id
-                        const userToken = jwt.sign(
-                            { id: userId },
-                            jwtSecretKey,
-                            {
-                                expiresIn: '1h'
-                            }
-                        )
                         expect(res.body.message).to.equal(
-                            `User created with id ${userId}.`
+                            `User with id ${userId} successfully updated.`
                         )
+                        expect(res.body)
+                            .to.have.property('data')
+                            .that.is.an('object')
+                        expect(res.body.data).to.have.property('id')
+                        expect(res.body.data)
+                            .to.have.property('firstName')
+                            .that.is.a('string')
+                            .that.equals('Updated')
+                        expect(res.body.data)
+                            .to.have.property('lastName')
+                            .that.is.a('string')
+                            .that.equals('Doe')
+                        expect(res.body.data)
+                            .to.have.property('emailAdress')
+                            .that.is.a('string')
+                            .that.equals('t.testen@example.com')
+                        expect(res.body.data)
+                            .to.have.property('phoneNumber')
+                            .that.is.a('string')
+                            .that.equals('0612345678')
+                        expect(res.body.data)
+                            .to.have.property('street')
+                            .that.is.a('string')
+                            .that.equals('Mainstreet')
+                        expect(res.body.data)
+                            .to.have.property('city')
+                            .that.is.a('string')
+                            .that.equals('New York')
+                        expect(res.body.data)
+                            .to.have.property('roles')
+                            .that.is.a('string')
+                            .that.equals('editor,guest')
 
                         // Delete the user
                         chai.request(server)
@@ -1019,6 +752,183 @@ describe('UC202 Opvragen van een overzicht van alle users', () => {
                             })
                     })
             })
+    })
+})
+
+describe('UC-206 Verwijderen van een user', () => {
+    beforeEach((done) => {
+        done()
+    })
+
+    it('TC-206-1 Gebruiker bestaat niet', (done) => {
+        console.log('Test started')
+
+        const token = jwt.sign({ id: 999 }, jwtSecretKey, {
+            expiresIn: '1h'
         })
+        const nonExistentUserId = 999 // ID of a non-existent user
+
+        chai.request(server)
+            .delete(`/api/user/${nonExistentUserId}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send({ firstName: 'Updated' })
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error deleting non-existent user:', err)
+                } else {
+                    console.log('Delete non-existent user response:', res.body)
+                }
+
+                expect(res).to.have.status(404)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(
+                    `User not found with id ${nonExistentUserId}.`
+                )
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
+
+    it('TC-206-2 Gebruiker is niet ingelogd', (done) => {
+        chai.request(server)
+            .delete('/api/user/:userId')
+            .send({ firstName: 'Updated' })
+            .end((err, res) => {
+                expect(res).to.have.status(401)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal('No token provided!')
+                expect(res.body).to.have.property('data').that.is.empty
+                done()
+            })
+    })
+
+    it('TC-206-3 Gebruiker is niet de eigenaar van de data', (done) => {
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 't.testssssss@example.com',
+            password: 'Secret1234',
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
+
+        // Create a new user
+        chai.request(server)
+            .post('/api/user')
+            .send(testUser)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating user:', err)
+                }
+
+                expect(res).to.have.status(200)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('data').that.is.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.message).to.equal(
+                    `User created with id ${res.body.data.id}.`
+                )
+
+                const userId = res.body.data.id
+
+                // Attempt to update the user's data with a different user's token
+                const otherUserId = 2 // ID of another user
+                const otherUserToken = jwt.sign(
+                    { id: otherUserId },
+                    jwtSecretKey,
+                    { expiresIn: '1h' }
+                )
+                const userToken = jwt.sign({ id: userId }, jwtSecretKey, {
+                    expiresIn: '1h'
+                })
+                chai.request(server)
+                    .delete(`/api/user/${userId}`)
+                    .set('Authorization', `Bearer ${otherUserToken}`)
+                    .end((err, res) => {
+                        if (err) {
+                            console.error('Error updating user data:', err)
+                        }
+
+                        expect(res).to.have.status(403)
+                        expect(res.body).to.be.an('object')
+                        expect(res.body)
+                            .to.have.property('message')
+                            .that.is.a('string')
+                        expect(res.body.message).to.equal(
+                            'Forbidden: You can only delete your own data'
+                        )
+                        expect(res.body).to.have.property('data').that.is.empty
+
+                        // Delete the test user
+                        chai.request(server)
+                            .delete(`/api/user/${userId}`)
+                            .set('Authorization', `Bearer ${userToken}`)
+                            .end((err, res) => {
+                                if (err) {
+                                    console.error('Error deleting user:', err)
+                                }
+
+                                expect(res).to.have.status(200)
+                                expect(res.body).to.be.an('object')
+                                expect(res.body)
+                                    .to.have.property('message')
+                                    .that.is.a('string')
+                                expect(res.body.message).to.equal(
+                                    `User deleted with id ${userId}.`
+                                )
+                                done()
+                            })
+                    })
+            })
+    })
+
+    it('TC-206-4 Gebruiker succesvol verwijderd', (done) => {
+        const testUser = {
+            firstName: 'John',
+            lastName: 'Doe',
+            emailAdress: 't.testen@example.com',
+            password: 'Secret1234',
+            phoneNumber: '0612345678',
+            street: 'Mainstreet',
+            city: 'New York',
+            roles: 'editor,guest'
+        }
+
+        // Create a new user
+        chai.request(server)
+            .post('/api/user')
+            .send(testUser)
+            .end((err, res) => {
+                res.should.have.status(200)
+                expect(res.body).to.have.property('message').that.is.a('string')
+                expect(res.body.data).to.have.property('id').that.is.a('number')
+
+                const userId = res.body.data.id
+                const userToken = jwt.sign({ id: userId }, jwtSecretKey, {
+                    expiresIn: '1h'
+                })
+                expect(res.body.message).to.equal(
+                    `User created with id ${userId}.`
+                )
+
+                // Delete the user
+                chai.request(server)
+                    .delete(`/api/user/${userId}`)
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .end((err, res) => {
+                        res.should.have.status(200)
+                        expect(res.body).to.be.an('object')
+                        expect(res.body)
+                            .to.have.property('message')
+                            .that.is.a('string')
+                        expect(res.body.message).to.equal(
+                            `User deleted with id ${userId}.`
+                        )
+                        done()
+                    })
+            })
     })
 })
