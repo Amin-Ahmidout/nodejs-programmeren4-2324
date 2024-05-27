@@ -273,9 +273,78 @@ describe('UC-305 verwijderen van een maaltijd', () => {
 
     })
 
-    it.skip('TC-305-2 niet de eigenaar van de data', (done) => {
-        	
-    })
+    it('TC-305-2 Gebruiker is niet de eigenaar van de data', (done) => {
+        const nonOwnerUserToken = jwt.sign({ id: 999 }, jwtSecretKey, { expiresIn: '1h' }); // Token voor een niet-eigenaar
+    
+        const newMealData = {
+            name: 'Pasta Bolognese',
+            description: 'Heerlijke pasta met bolognesesaus',
+            price: 8.50,
+            dateTime: '2024-05-26 18:00:00',
+            maxAmountOfParticipants: 10,
+            imageUrl: 'https://example.com/image.jpg',
+            isActive: true,
+            isVega: false,
+            isVegan: false,
+            isToTakeHome: true,
+            allergenes: 'gluten'
+        };
+    
+        const userToken = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' }); // Token voor een eigenaar
+    
+        // Maak een nieuwe maaltijd aan
+        chai.request(server)
+            .post('/api/meal')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send(newMealData)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating meal:', err);
+                    return done(err);
+                }
+    
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('data').that.is.an('object');
+                const mealId = res.body.data.id;
+    
+                // Probeer de maaltijd te verwijderen met een andere gebruiker
+                chai.request(server)
+                    .delete(`/api/meal/${mealId}`)
+                    .set('Authorization', `Bearer ${nonOwnerUserToken}`)
+                    .end((err, res) => {
+                        if (err) {
+                            console.error('Error deleting meal:', err);
+                            return done(err);
+                        }
+    
+                        // Verwacht een 403 Forbidden status omdat de ingelogde gebruiker niet de eigenaar is
+                        expect(res).to.have.status(403);
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('message').that.is.a('string');
+                        expect(res.body.message).to.equal("Forbidden: You can only delete your own meals");
+    
+                        // Verwijder de maaltijd met de juiste eigenaar
+                        chai.request(server)
+                            .delete(`/api/meal/${mealId}`)
+                            .set('Authorization', `Bearer ${userToken}`)
+                            .end((err, res) => {
+                                if (err) {
+                                    console.error('Error deleting meal:', err);
+                                    return done(err);
+                                }
+    
+                                expect(res).to.have.status(200);
+                                expect(res.body).to.be.an('object');
+                                expect(res.body).to.have.property('message').that.is.a('string');
+                                expect(res.body.message).to.equal(`Meal with ID ${mealId} deleted successfully.`);
+    
+                                done();
+                            });
+                    });
+            });
+    });
+    
 
     it.skip('TC-305-3 maaltijd bestaat niet', (done) => {
 
