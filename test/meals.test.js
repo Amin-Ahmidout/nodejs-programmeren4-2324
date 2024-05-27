@@ -346,7 +346,7 @@ describe('UC-305 verwijderen van een maaltijd', () => {
     });
     
 
-    it('TC-305-4 Verwijderen van een maaltijd die niet bestaat', (done) => {
+    it('TC-305-3 Verwijderen van een maaltijd die niet bestaat', (done) => {
         const nonExistentMealId = 999999; // Een ID waarvan we zeker weten dat het niet bestaat
         const userToken = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' }); // Token voor een eigenaar
     
@@ -370,9 +370,59 @@ describe('UC-305 verwijderen van een maaltijd', () => {
     });
     
 
-    it.skip('TC-305-4 maaltijd succesvol verwijderd', (done) => {
-
-    })
+    it('TC-305-4 Maaltijd succesvol verwijderd', (done) => {
+        const newMealData = {
+            name: 'Pasta Bolognese',
+            description: 'Heerlijke pasta met bolognesesaus',
+            price: 8.50,
+            dateTime: '2024-05-26 18:00:00',
+            maxAmountOfParticipants: 10,
+            imageUrl: 'https://example.com/image.jpg',
+            isActive: true,
+            isVega: false,
+            isVegan: false,
+            isToTakeHome: true,
+            allergenes: 'gluten'
+        };
+    
+        const userToken = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+    
+        // Maak een nieuwe maaltijd aan
+        chai.request(server)
+            .post('/api/meal')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send(newMealData)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating meal:', err);
+                    return done(err);
+                }
+    
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('data').that.is.an('object');
+                const mealId = res.body.data.id;
+    
+                // Verwijder de maaltijd
+                chai.request(server)
+                    .delete(`/api/meal/${mealId}`)
+                    .set('Authorization', `Bearer ${userToken}`)
+                    .end((err, res) => {
+                        if (err) {
+                            console.error('Error deleting meal:', err);
+                            return done(err);
+                        }
+    
+                        expect(res).to.have.status(200);
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('message').that.is.a('string');
+                        expect(res.body.message).to.equal(`Meal with ID ${mealId} deleted successfully.`);
+    
+                        done();
+                    });
+            });
+    });
+    
 })
 
 
