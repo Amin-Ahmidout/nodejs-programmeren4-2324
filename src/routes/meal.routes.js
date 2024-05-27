@@ -92,6 +92,6 @@ router.get('/api/meal/', validateToken, mealController.getAllMeals)
 router.get('/api/meal/:mealId', validateToken, mealController.getMealById)
 router.delete('/api/meal/:mealId', validateToken, mealController.deleteMeal)
 router.post('/api/meal/', validateToken, validateMissingMealFields, mealController.createMeal)
-
+// router.put('/api/meal/:mealId', validateToken, mealController.updateMeal)
 
 module.exports = router

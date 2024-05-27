@@ -83,7 +83,6 @@ let mealController = {
                 });
             }
         });
-    }
+    },
 }
-
 module.exports = mealController
