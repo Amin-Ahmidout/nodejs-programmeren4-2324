@@ -42,23 +42,25 @@ let mealController = {
     },
 
     deleteMeal: (req, res, next) => {
-        const mealId = parseInt(req.params.mealId, 10)
-        mealService.deleteMeal(mealId, (error, success) => {
+        const mealId = parseInt(req.params.mealId, 10);
+        const userId = req.userId; // Zorg ervoor dat je de userId hebt vanuit je auth middleware
+    
+        mealService.deleteMeal(mealId, userId, (error, success) => {
             if (error) {
-                return next({
-                    status: error.status,
+                return res.status(error.status || 500).json({
+                    status: error.status || 500,
                     message: error.message,
                     data: {}
-                })
+                });
             }
             if (success) {
                 res.status(200).json({
                     status: 200,
                     message: success.message,
                     data: success.data
-                })
+                });
             }
-        })
+        });
     },
 
     createMeal: (req, res, next) => {

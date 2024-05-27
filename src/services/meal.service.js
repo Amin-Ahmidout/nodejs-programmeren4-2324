@@ -37,24 +37,25 @@ const mealService = {
         });
     },
 
-    deleteMeal: (id, callback) => {
-        database.deleteMeal(id, (err, data) => {
+    deleteMeal: (mealId, userId, callback) => {
+        database.getCookIdByMealId(mealId, (err, cookId) => {
             if (err) {
-                callback(err, null)
+                callback(err, null);
+            } else if (cookId !== userId) {
+                callback({ status: 403, message: "Forbidden: You can only delete your own meals" }, null);
             } else {
-                if (data) {
-                    callback(null, {
-                        message: `Meal with ID ${id} deleted successfully.`,
-                        data: data
-                    })
-                } else {
-                    callback(null, {
-                        message: `Meal with ID ${id} not found.`,
-                        data: null
-                    })
-                }
+                database.deleteMeal(mealId, (err, data) => {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, {
+                            message: `Meal with ID ${mealId} deleted successfully.`,
+                            data: data
+                        });
+                    }
+                });
             }
-        })
+        });
     },
 
     createMeal: (meal, callback) => {

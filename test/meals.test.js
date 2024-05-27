@@ -137,7 +137,7 @@ describe('UC301 toevoegen van maaltijd', () => {
                     });
             });
     });
-    
+}) 
 describe ('UC-303 opvragen van maaltijden', () => {
     beforeEach((done) => {
         done()
@@ -288,4 +288,4 @@ describe('UC-305 verwijderen van een maaltijd', () => {
 
 
 
-})
+

@@ -375,6 +375,18 @@ getProfile(id, callback) {
       }
     });
   },
+
+  getCookIdByMealId(mealId, callback) {
+    const sql = "SELECT cookId FROM meal WHERE id = ?";
+    pool.query(sql, [mealId], (err, results) => {
+        if (err) {
+            callback(err, null);
+        } else {
+            callback(null, results[0] ? results[0].cookId : null);
+        }
+    });
+}
+
 };
  
 module.exports = mysqlDb;
