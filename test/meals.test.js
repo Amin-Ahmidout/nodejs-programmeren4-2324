@@ -346,11 +346,31 @@ describe('UC-305 verwijderen van een maaltijd', () => {
     });
     
 
-    it.skip('TC-305-3 maaltijd bestaat niet', (done) => {
+    it('TC-305-4 Verwijderen van een maaltijd die niet bestaat', (done) => {
+        const nonExistentMealId = 999999; // Een ID waarvan we zeker weten dat het niet bestaat
+        const userToken = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' }); // Token voor een eigenaar
+    
+        chai.request(server)
+            .delete(`/api/meal/${nonExistentMealId}`)
+            .set('Authorization', `Bearer ${userToken}`)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error deleting meal:', err);
+                    return done(err);
+                }
+    
+                // Verwacht een 404 Not Found status omdat de maaltijd niet bestaat
+                expect(res).to.have.status(404);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('message').that.is.a('string');
+                expect(res.body.message).to.equal(`Meal with ID ${nonExistentMealId} not found`);
+    
+                done();
+            });
+    });
+    
 
-    })
-
-    it.skip('TC-305-4 maaltijd succesvol bijgewerkt', (done) => {
+    it.skip('TC-305-4 maaltijd succesvol verwijderd', (done) => {
 
     })
 })

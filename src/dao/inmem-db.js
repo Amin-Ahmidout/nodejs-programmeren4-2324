@@ -381,11 +381,14 @@ getProfile(id, callback) {
     pool.query(sql, [mealId], (err, results) => {
         if (err) {
             callback(err, null);
+        } else if (results.length === 0) {
+            callback({ status: 404, message: `Meal with ID ${mealId} not found` }, null);
         } else {
-            callback(null, results[0] ? results[0].cookId : null);
+            callback(null, results[0].cookId);
         }
     });
 }
+
 
 };
  
