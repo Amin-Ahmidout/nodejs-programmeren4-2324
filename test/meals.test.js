@@ -269,9 +269,75 @@ describe('UC-304 opvragen van maaltijd bij ID', () => {
 })
 
 describe('UC-305 verwijderen van een maaltijd', () => {
-    it.skip('TC-305-1 niet ingelogd', (done) => {
-
-    })
+    it('TC-305-1 Gebruiker is niet ingelogd', (done) => {
+        const newMealData = {
+            name: 'Pasta Bolognese',
+            description: 'Heerlijke pasta met bolognesesaus',
+            price: 8.50,
+            dateTime: '2024-05-26 18:00:00',
+            maxAmountOfParticipants: 10,
+            imageUrl: 'https://example.com/image.jpg',
+            isActive: true,
+            isVega: false,
+            isVegan: false,
+            isToTakeHome: true,
+            allergenes: 'gluten'
+        };
+    
+        const userToken = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+    
+        // Maak een nieuwe maaltijd aan
+        chai.request(server)
+            .post('/api/meal')
+            .set('Authorization', `Bearer ${userToken}`)
+            .send(newMealData)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating meal:', err);
+                    return done(err);
+                }
+    
+                expect(res).to.have.status(200);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('data').that.is.an('object');
+                const mealId = res.body.data.id;
+    
+                // Probeer de maaltijd te verwijderen zonder in te loggen
+                chai.request(server)
+                    .delete(`/api/meal/${mealId}`)
+                    .end((err, res) => {
+                        if (err) {
+                            console.error('Error trying to delete meal without logging in:', err);
+                            return done(err);
+                        }
+    
+                        // Verwacht een 401 Unauthorized status omdat de gebruiker niet is ingelogd
+                        expect(res).to.have.status(401);
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('message').that.is.a('string');
+                        expect(res.body.message).to.equal('No token provided!');
+    
+                        // Verwijder de maaltijd met de juiste eigenaar
+                        chai.request(server)
+                            .delete(`/api/meal/${mealId}`)
+                            .set('Authorization', `Bearer ${userToken}`)
+                            .end((err, res) => {
+                                if (err) {
+                                    console.error('Error deleting meal:', err);
+                                    return done(err);
+                                }
+    
+                                expect(res).to.have.status(200);
+                                expect(res.body).to.be.an('object');
+                                expect(res.body).to.have.property('message').that.is.a('string');
+                                expect(res.body.message).to.equal(`Meal with ID ${mealId} deleted successfully.`);
+    
+                                done();
+                            });
+                    });
+            });
+    });
+    
 
     it('TC-305-2 Gebruiker is niet de eigenaar van de data', (done) => {
         const nonOwnerUserToken = jwt.sign({ id: 999 }, jwtSecretKey, { expiresIn: '1h' }); // Token voor een niet-eigenaar
