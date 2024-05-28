@@ -57,8 +57,8 @@ jobs:
             MYSQL_ROOT_PASSWORD: root
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
-            DB_DATABASE: 2224569
-            DB_USER: 2224569
+            DB_DATABASE: '2224569'
+            DB_USER: '2224569'
             DB_PASSWORD: secret
             PORT: 3300
         services:
