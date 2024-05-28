@@ -71,8 +71,47 @@ const mealService = {
         })
     },
 
+    updateMeal: (id, updatedMeal, authUserId, callback) => {
+        console.log(`authUserId: ${authUserId}, mealId: ${id}`); // Log the IDs for debugging
     
-
+        // Assuming cookId is supposed to be the ID of the user who created the meal.
+        database.getMealById(id, (err, meal) => {
+            if (err) {
+                return callback({ status: 500, message: 'Error fetching meal' }, null);
+            }
+            if (!meal) {
+                return callback({ status: 404, message: `Meal with ID ${id} not found` }, null);
+            }
+    
+            const cookId = meal.cookId;  // Assuming the meal has a `cookId` property
+            if (parseInt(cookId) !== parseInt(authUserId)) {
+                return callback({ status: 403, message: 'Forbidden: You can only update your own data' }, null);
+            }
+    
+            database.updateMeal(id, updatedMeal, (err, data) => {
+                if (err) {
+                    callback({ status: 400, message: err.message }, null);
+                } else {
+                    if (data) {
+                        callback(null, {
+                            status: 200,
+                            message: `Meal updated with id ${id}.`,
+                            data: data
+                        });
+                    } else {
+                        callback({
+                            status: 404,
+                            message: `Meal not found with id ${id}.`,
+                            data: null
+                        }, null);
+                    }
+                }
+            });
+        });
+    }
+    
+    
+    
 }
 
 module.exports = mealService

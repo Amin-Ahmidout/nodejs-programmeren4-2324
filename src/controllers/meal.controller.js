@@ -84,5 +84,39 @@ let mealController = {
             }
         });
     },
+
+    updateMeal: (req, res, next) => {
+        const mealId = req.params.mealId;
+        const updatedMeal = req.body;
+        const authUserId = req.userId;  // Extracted from validateToken middleware
+    
+        console.log(`authUserId from token: ${authUserId}, mealId: ${mealId}, updatedMeal: ${JSON.stringify(updatedMeal)}`);
+    
+        mealService.updateMeal(mealId, updatedMeal, authUserId, (error, success) => {
+            if (error) {
+                return next({
+                    status: error.status || 500,
+                    message: error.message || 'An error occurred',
+                    data: {}
+                });
+            }
+            if (success) {
+                res.status(200).json({
+                    status: 200,
+                    message: `Meal with id ${mealId} successfully updated.`,
+                    data: success.data
+                });
+            } else {
+                res.status(404).json({
+                    status: 404,
+                    message: `Meal with id ${mealId} not found.`,
+                    data: {}
+                });
+            }
+        });
+    }
+    
+    
+    
 }
 module.exports = mealController

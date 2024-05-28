@@ -389,11 +389,95 @@ getProfile(id, callback) {
     });
 },
 
+updateMeal(id, newData, callback) {
+  // Eerst de huidige waarden van de maaltijd ophalen
+  const getMealSql = 'SELECT * FROM meal WHERE id = ?';
+  pool.query(getMealSql, [id], (err, results) => {
+      if (err) {
+          console.error('SQL error:', err);
+          return callback(err, null);
+      }
+      if (results.length === 0) {
+          return callback({ message: `Meal with ID ${id} not found`, status: 404 }, null);
+      }
+
+      // Bestaande gegevens van de maaltijd
+      const existingMeal = results[0];
+
+      // Gegevens bijwerken met nieuwe waarden, indien aanwezig
+      const updatedMeal = {
+          isActive: newData.isActive !== undefined ? newData.isActive : existingMeal.isActive,
+          isVega: newData.isVega !== undefined ? newData.isVega : existingMeal.isVega,
+          isVegan: newData.isVegan !== undefined ? newData.isVegan : existingMeal.isVegan,
+          isToTakeHome: newData.isToTakeHome !== undefined ? newData.isToTakeHome : existingMeal.isToTakeHome,
+          dateTime: newData.dateTime || existingMeal.dateTime,
+          maxAmountOfParticipants: newData.maxAmountOfParticipants || existingMeal.maxAmountOfParticipants,
+          price: newData.price || existingMeal.price,
+          imageUrl: newData.imageUrl || existingMeal.imageUrl,
+          createDate: newData.createDate || existingMeal.createDate,
+          updateDate: newData.updateDate || existingMeal.updateDate,
+          name: newData.name || existingMeal.name,
+          description: newData.description || existingMeal.description,
+          allergenes: newData.allergenes || existingMeal.allergenes
+      };
+
+      const sql = `
+          UPDATE meal
+          SET 
+              isActive = ?, 
+              isVega = ?, 
+              isVegan = ?, 
+              isToTakeHome = ?, 
+              dateTime = ?, 
+              maxAmountOfParticipants = ?, 
+              price = ?, 
+              imageUrl = ?, 
+              createDate = ?, 
+              updateDate = ?, 
+              name = ?, 
+              description = ?, 
+              allergenes = ?
+          WHERE id = ?
+      `;
+      const values = [
+          updatedMeal.isActive,
+          updatedMeal.isVega,
+          updatedMeal.isVegan,
+          updatedMeal.isToTakeHome,
+          updatedMeal.dateTime,
+          updatedMeal.maxAmountOfParticipants,
+          updatedMeal.price,
+          updatedMeal.imageUrl,
+          updatedMeal.createDate,
+          updatedMeal.updateDate,
+          updatedMeal.name,
+          updatedMeal.description,
+          updatedMeal.allergenes,
+          id,
+      ];
+
+      pool.query(sql, values, (err, result) => {
+          if (err) {
+              console.error('SQL error:', err);
+              callback(err, null);
+          } else {
+              if (result.affectedRows) {
+                  callback(null, { id, ...updatedMeal });
+              } else {
+                  callback({ message: `Meal with ID ${id} not found`, status: 404 }, null);
+              }
+          }
+      });
+  });
+},
+
+}
 
 
 
 
 
-};
+
+
  
 module.exports = mysqlDb;
