@@ -31,36 +31,38 @@ function validateToken(req, res, next) {
   logger.trace("Headers:", req.headers);
   const authHeader = req.headers.authorization;
   if (!authHeader) {
-    logger.warn("No token provided!");
-    next({
-      status: 401,
-      message: "No token provided!",
-      data: {},
-    });
-  } else {
-    const token = authHeader.substring(7, authHeader.length);
- 
-    jwt.verify(token, jwtSecretKey, (err, payload) => {
-      if (err) {
-        logger.debug("token:" + token);
-        logger.debug("jwtSecretKey:" + jwtSecretKey);
-        logger.warn("Token invalid!" + err.message);
-        next({
+      logger.warn("No token provided!");
+      next({
           status: 401,
-          message: "Token invalid!",
+          message: "No token provided!",
           data: {},
-        });
-      }
-      if (payload) {
-        logger.debug("token is valid", payload);
-        req.userId = payload.id;
-        logger.debug("userId:", req.userId);
-        logger.debug("payload:", payload.id);
-        next();
-      }
-    });
+      });
+  } else {
+      const token = authHeader.substring(7, authHeader.length);
+
+      jwt.verify(token, jwtSecretKey, (err, payload) => {
+          if (err) {
+              logger.debug("token:" + token);
+              logger.debug("jwtSecretKey:" + jwtSecretKey);
+              logger.warn("Token invalid!" + err.message);
+              next({
+                  status: 401,
+                  message: "Token invalid!",
+                  data: {},
+              });
+          }
+          if (payload) {
+              logger.debug("token is valid", payload);
+              req.userId = payload.id;
+              logger.debug("userId set in request:", req.userId);  // Log the userId set
+              next();
+          }
+      });
   }
 }
+
+
+
  
 router.post('/api/login', validateLogin, authController.login)
  

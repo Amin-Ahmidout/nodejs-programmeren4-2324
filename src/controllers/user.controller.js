@@ -69,29 +69,43 @@ let userController = {
     updateUser: (req, res, next) => {
         const userId = req.params.userId;
         const updatedUser = req.body;
+        const authUserId = req.userId;  // Extracted from validateToken middleware
         
-        userService.updateUser(userId, updatedUser, (error, success) => {
+        userService.updateUser(userId, updatedUser, authUserId, (error, success) => {
             if (error) {
                 return next({
-                    status: error.status,
-                    message: error.message,
+                    status: error.status || 500,
+                    message: error.message || 'An error occurred',
                     data: {}
                 });
             }
             if (success) {
                 res.status(200).json({
-                    status: success.status,
-                    message: success.message,
+                    status: 200,
+                    message: `User with id ${userId} successfully updated.`,
                     data: success.data
+                });
+            } else {
+                res.status(404).json({
+                    status: 404,
+                    message: `User with id ${userId} not found.`,
+                    data: {}
                 });
             }
         });
     },
+    
+    
+      
+    
 
     delete: (req, res, next) => {
         const userId = req.params.userId;
+        const authUserId = req.userId;  // Extracted from validateToken middleware
+    
+        console.log(`Controller - authUserId: ${authUserId}, userId: ${userId}`);  // Add logging for debugging
         
-        userService.delete(userId, (error, success) => {
+        userService.delete(userId, authUserId, (error, success) => {
             if (error) {
                 return next({
                     status: error.status,
@@ -107,7 +121,8 @@ let userController = {
                 });
             }
         });
-    },
+    }
+    ,
 
     getProfile: (req, res, next) => {
         const userId = req.userId;

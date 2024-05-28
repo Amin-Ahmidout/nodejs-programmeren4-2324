@@ -59,8 +59,8 @@ const validateUserCreateAssert = (req, res, next) => {
 const validateEmail = (req, res, next) => {
     try {
         const email = req.body.emailAdress;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!email || !emailRegex.test(email)) {
+        const emailRegex = /^[a-zA-Z]\.[a-zA-Z]{2,}@([a-zA-Z]{2,}\.)+[a-zA-Z]{2,3}$/;
+        if (!emailRegex.test(email)) {
             throw new Error('Invalid email address');
         }
         next();
@@ -137,7 +137,7 @@ router.get('/api/user/:userId', validateToken, userController.getById)
 
 // Tijdelijke routes om niet bestaande routes op te vangen
 router.put('/api/user/:userId', validateEmail, validateToken, validatePhoneNumber, userController.updateUser)
-router.delete('/api/user/:userId', userController.delete)
+router.delete('/api/user/:userId', validateToken, userController.delete)
 
 
 module.exports = router
