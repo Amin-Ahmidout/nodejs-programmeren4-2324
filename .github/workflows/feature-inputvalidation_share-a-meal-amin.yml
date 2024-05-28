@@ -57,9 +57,9 @@ jobs:
             MYSQL_ROOT_PASSWORD: root
             DB_HOST: 127.0.0.1
             DB_PORT: 3306
-            DB_DATABASE: share_a_meal
-            DB_USER: root
-            DB_PASSWORD: root
+            DB_DATABASE: 2224569
+            DB_USER: 2224569
+            DB_PASSWORD: secret
             PORT: 3000  # Stel de poort in waarop je server moet draaien
         services:
             mysql:
@@ -68,8 +68,15 @@ jobs:
                 - 3306
                 options: >-
                     --default-authentication-plugin=mysql_native_password
+                env:
+                    MYSQL_ROOT_PASSWORD: root
 
         steps:
+            - name: Create custom MySQL configuration
+              run: |
+                  echo "[mysqld]" > my.cnf
+                  echo "default-authentication-plugin=mysql_native_password" >> my.cnf
+
             - name: Download artifact from build job
               uses: actions/download-artifact@v4
               with:
