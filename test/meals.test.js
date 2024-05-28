@@ -144,8 +144,65 @@ describe('UC-302 wijzigen van maaltijd', () => {
         done()
     })
 
+    it('TC-302-1 Verplicht velden “name” en/of “price”en/of “maxAmountOfParticipants” ontbreken', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
+    
+        const mealData = {
+            description: 'Heerlijke pasta met bolognesesaus',
+            dateTime: '2024-05-26 18:00:00',
+            imageUrl: 'https://example.com/image.jpg'
+        };
+    
+        // Test missing 'name'
+        let updatedMeal = { ...mealData, price: 5.00, maxAmountOfParticipants: 10 };
+    
+        chai.request(server)
+            .put('/api/meal/:mealId') // Adjust the endpoint as needed
+            .set('Authorization', `Bearer ${token}`)
+            .send(updatedMeal)
+            .end((err, res) => {
+                expect(res).to.have.status(400);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('message').that.is.a('string');
+                expect(res.body.message).to.equal('Missing required field(s): name');
+                expect(res.body).to.have.property('data').that.is.empty;
+    
+                // Test missing 'price'
+                updatedMeal = { ...mealData, name: 'Pasta Bolognese', maxAmountOfParticipants: 10 };
+    
+                chai.request(server)
+                    .put('/api/meal/:mealId') // Adjust the endpoint as needed
+                    .set('Authorization', `Bearer ${token}`)
+                    .send(updatedMeal)
+                    .end((err, res) => {
+                        expect(res).to.have.status(400);
+                        expect(res.body).to.be.an('object');
+                        expect(res.body).to.have.property('message').that.is.a('string');
+                        expect(res.body.message).to.equal('Missing required field(s): price');
+                        expect(res.body).to.have.property('data').that.is.empty;
+    
+                        // Test missing 'maxAmountOfParticipants'
+                        updatedMeal = { ...mealData, name: 'Pasta Bolognese', price: 5.00 };
+    
+                        chai.request(server)
+                            .put('/api/meal/:mealId') // Adjust the endpoint as needed
+                            .set('Authorization', `Bearer ${token}`)
+                            .send(updatedMeal)
+                            .end((err, res) => {
+                                expect(res).to.have.status(400);
+                                expect(res.body).to.be.an('object');
+                                expect(res.body).to.have.property('message').that.is.a('string');
+                                expect(res.body.message).to.equal('Missing required field(s): maxAmountOfParticipants');
+                                expect(res.body).to.have.property('data').that.is.empty;
+    
+                                done();
+                            });
+                    });
+            });
+    });
     
 })
+
 
 describe ('UC-303 opvragen van maaltijden', () => {
     beforeEach((done) => {
