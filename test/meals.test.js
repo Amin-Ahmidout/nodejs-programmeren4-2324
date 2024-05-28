@@ -201,6 +201,29 @@ describe('UC-302 wijzigen van maaltijd', () => {
             });
     });
     
+    it('TC-302-2 Gebruiker is niet ingelogd', (done) => {
+        const mealData = {
+            name: 'Pasta Bolognese',
+            description: 'Heerlijke pasta met bolognesesaus',
+            price: 8.50,
+            dateTime: '2024-05-26 18:00:00',
+            maxAmountOfParticipants: 10,
+            imageUrl: 'https://example.com/image.jpg'
+        };
+    
+        chai.request(server)
+            .put('/api/meal/:mealId') // Adjust the endpoint as needed
+            .send(mealData)
+            .end((err, res) => {
+                expect(res).to.have.status(401);
+                expect(res.body).to.be.an('object');
+                expect(res.body).to.have.property('message').that.is.a('string');
+                expect(res.body.message).to.equal('No token provided!');
+                expect(res.body).to.have.property('data').that.is.empty;
+    
+                done();
+            });
+    });
 })
 
 
