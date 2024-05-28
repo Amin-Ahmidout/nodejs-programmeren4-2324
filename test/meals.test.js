@@ -329,36 +329,129 @@ describe('UC-302 wijzigen van maaltijd', () => {
     })
 
     it('TC-302-4 Maaltijd bestaat niet', (done) => {
-        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' });
-    
-        const nonExistentMealId = 99999; // ID van een niet-bestaande maaltijd
-    
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
+
+        const nonExistentMealId = 99999 // ID van een niet-bestaande maaltijd
+
         chai.request(server)
             .put(`/api/meal/${nonExistentMealId}`)
-            .send({ name: 'Pasta Bolognese', description: 'Heerlijke pasta met bolognesesaus', price: 8.5, dateTime: '2024-05-26 18:00:00', maxAmountOfParticipants: 10, imageUrl: 'https://example.com/image.jpg' })
+            .send({
+                name: 'Pasta Bolognese',
+                description: 'Heerlijke pasta met bolognesesaus',
+                price: 8.5,
+                dateTime: '2024-05-26 18:00:00',
+                maxAmountOfParticipants: 10,
+                imageUrl: 'https://example.com/image.jpg'
+            })
             .set('Authorization', `Bearer ${token}`)
             .end((err, res) => {
                 if (err) {
-                    console.error('Error updating meal:', err);
-                    return done(err);
+                    console.error('Error updating meal:', err)
+                    return done(err)
                 }
-    
+
                 // Log the response for debugging purposes
-                console.log('Response status:', res.status);
-                console.log('Response body:', res.body);
-    
+                console.log('Response status:', res.status)
+                console.log('Response body:', res.body)
+
                 // Verwacht een 404 Not Found status omdat de maaltijd niet bestaat
-                expect(res).to.have.status(404);
-                expect(res.body).to.be.an('object');
-                expect(res.body).to.have.property('message').that.is.a('string');
+                expect(res).to.have.status(404)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('message').that.is.a('string')
                 expect(res.body.message).to.equal(
                     `Meal with ID ${nonExistentMealId} not found`
-                );
-    
-                done();
-            });
-    });
-    
+                )
+
+                done()
+            })
+    })
+
+    it('TC-302-5 Maaltijd succesvol gewijzigd', (done) => {
+        const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
+
+        const newMealData = {
+            name: 'Pasta Bolognese',
+            description: 'Heerlijke pasta met bolognesesaus',
+            price: 8.5,
+            dateTime: '2024-05-26 18:00:00',
+            maxAmountOfParticipants: 10,
+            imageUrl: 'https://example.com/image.jpg',
+            isActive: true,
+            isVega: false,
+            isVegan: false,
+            isToTakeHome: true,
+            allergenes: 'gluten'
+        }
+
+        // Voeg een nieuwe maaltijd toe
+        chai.request(server)
+            .post('/api/meal')
+            .set('Authorization', `Bearer ${token}`)
+            .send(newMealData)
+            .end((err, res) => {
+                if (err) {
+                    console.error('Error creating meal:', err)
+                    return done(err)
+                }
+
+                expect(res).to.have.status(200)
+                expect(res.body).to.be.an('object')
+                expect(res.body).to.have.property('data').that.is.an('object')
+                const mealId = res.body.data.id
+
+                // Update de maaltijd met de gegenereerde ID
+                const updatedMealData = {
+                    name: 'Pasta Carbonara',
+                    description: 'Heerlijke pasta met carbonarasaus',
+                    price: 9.5,
+                    dateTime: '2024-05-26 18:00:00',
+                    maxAmountOfParticipants: 15,
+                    imageUrl: 'https://example.com/image2.jpg',
+                    isActive: true,
+                    isVega: false,
+                    isVegan: false,
+                    isToTakeHome: true,
+                    allergenes: 'gluten'
+                }
+
+                chai.request(server)
+                    .put(`/api/meal/${mealId}`)
+                    .set('Authorization', `Bearer ${token}`)
+                    .send(updatedMealData)
+                    .end((err, res) => {
+                        if (err) {
+                            console.error('Error updating meal:', err)
+                            return done(err)
+                        }
+
+                        // We verwachten een 200 status omdat de maaltijd succesvol is gewijzigd
+                        expect(res).to.have.status(200)
+                        expect(res.body).to.be.an('object')
+                        expect(res.body)
+                            .to.have.property('data')
+                            .that.is.an('object')
+                        expect(res.body)
+                            .to.have.property('message')
+                            .that.is.a('string')
+                        expect(res.body.message).to.equal(
+                            `Meal with id ${mealId} successfully updated.`
+                        )
+
+                        chai.request(server)
+                            .delete(`/api/meal/${mealId}`)
+                            .set('Authorization', `Bearer ${token}`)
+                            .end((err, res) => {
+                                if (err) {
+                                    console.error('Error deleting meal:', err)
+                                    return done(err)
+                                }
+
+                                expect(res).to.have.status(200)
+                                done()
+                            })
+                    })
+            })
+    })
 })
 
 describe('UC-303 opvragen van maaltijden', () => {
