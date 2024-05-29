@@ -15,10 +15,8 @@ const endpointToTest = '/api/login'
 
 describe('UC101 Inloggen', () => {
     beforeEach((done) => {
-        db.getConnection((err, connection) => {
-            if (err) throw err;
-                done();
-        })
+        
+        done()
     })
 
     it('TC-101-1 Verplicht veld ontbreekt', (done) => {

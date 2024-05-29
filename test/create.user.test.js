@@ -6,7 +6,6 @@ const expect = chai.expect
 const assert = require('assert')
 const jwt = require('jsonwebtoken')
 const jwtSecretKey = require('../src/util/config').secretkey
-const db = require('../src/dao/dbconnection')
 
 chai.should()
 chai.use(chaiHttp)
@@ -21,11 +20,9 @@ describe('UC201 Registreren als nieuwe user', () => {
      * Hiermee kun je code hergebruiken of initialiseren.
      */
     beforeEach((done) => {
-      db.getConnection((err, connection) => {
-          if (err) throw err;
-              done();
-      })
-  })
+      
+        done()
+    })
 
     /**
      * Hier starten de testcases
@@ -236,11 +233,8 @@ describe('UC202 Opvragen van een overzicht van alle users', () => {
      * Hiermee kun je code hergebruiken of initialiseren.
      */
     beforeEach((done) => {
-      db.getConnection((err, connection) => {
-          if (err) throw err;
-              done();
-      })
-  })
+        done()
+    })
     it('TC-202-1 Toon alle gebruikers', (done) => {
         const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
         chai.request(server)
@@ -375,12 +369,6 @@ describe('UC202 Opvragen van een overzicht van alle users', () => {
 })
 
 describe('UC203 Opvragen van een gebruikersprofiel', () => {
-  beforeEach((done) => {
-    db.getConnection((err, connection) => {
-        if (err) throw err;
-            done();
-    })
-})
     it('TC-203-1 ongeldig token', (done) => {
         chai.request(server)
             .get('/api/user/profile')
@@ -419,12 +407,9 @@ describe('UC203 Opvragen van een gebruikersprofiel', () => {
 })
 
 describe('UC-204 Opvragen van usergegevens bij ID', () => {
-  beforeEach((done) => {
-    db.getConnection((err, connection) => {
-        if (err) throw err;
-            done();
+    beforeEach((done) => {
+        done()
     })
-})
 
     it('TC-204-1 Ongeldig token', (done) => {
         chai.request(server)
@@ -487,12 +472,9 @@ describe('UC-204 Opvragen van usergegevens bij ID', () => {
 })
 
 describe('UC-205 Wijzigen van usergegevens', () => {
-  beforeEach((done) => {
-    db.getConnection((err, connection) => {
-        if (err) throw err;
-            done();
+    beforeEach((done) => {
+        done()
     })
-})
 
     it('TC-205-1 Verplicht veld emailAdress ontbreekt', (done) => {
         const token = jwt.sign({ id: 1 }, jwtSecretKey, {
@@ -775,12 +757,9 @@ describe('UC-205 Wijzigen van usergegevens', () => {
 })
 
 describe('UC-206 Verwijderen van een user', () => {
-  beforeEach((done) => {
-    db.getConnection((err, connection) => {
-        if (err) throw err;
-            done();
+    beforeEach((done) => {
+        done()
     })
-})
 
     it('TC-206-1 Gebruiker bestaat niet', (done) => {
         console.log('Test started')
