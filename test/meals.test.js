@@ -14,7 +14,10 @@ const endpointToTest = '/api/meal'
 
 describe('UC301 toevoegen van maaltijd', () => {
     beforeEach((done) => {
-        done()
+        db.getConnection((err, connection) => {
+            if (err) throw err;
+                done();
+        })
     })
 
     it('TC-301-1 Verplicht veld ontbreekt bij toevoegen maaltijd', (done) => {
@@ -138,7 +141,10 @@ describe('UC301 toevoegen van maaltijd', () => {
 
 describe('UC-302 wijzigen van maaltijd', () => {
     beforeEach((done) => {
-        done()
+        db.getConnection((err, connection) => {
+            if (err) throw err;
+                done();
+        })
     })
 
     it('TC-302-1 Verplicht velden “name” en/of “price”en/of “maxAmountOfParticipants” ontbreken', (done) => {
@@ -456,7 +462,10 @@ describe('UC-302 wijzigen van maaltijd', () => {
 
 describe('UC-303 opvragen van maaltijden', () => {
     beforeEach((done) => {
-        done()
+        db.getConnection((err, connection) => {
+            if (err) throw err;
+                done();
+        })
     })
     it('TC-303-1 Lijst van maaltijden geretourneerd', (done) => {
         const token = jwt.sign({ id: 1 }, jwtSecretKey, { expiresIn: '1h' })
@@ -475,7 +484,10 @@ describe('UC-303 opvragen van maaltijden', () => {
 
 describe('UC-304 opvragen van maaltijd bij ID', () => {
     beforeEach((done) => {
-        done()
+        db.getConnection((err, connection) => {
+            if (err) throw err;
+                done();
+        })
     })
 
     it('TC-304-1 Maaltijd bestaat niet', (done) => {
@@ -594,6 +606,12 @@ describe('UC-304 opvragen van maaltijd bij ID', () => {
 })
 
 describe('UC-305 verwijderen van een maaltijd', () => {
+    beforeEach((done) => {
+        db.getConnection((err, connection) => {
+            if (err) throw err;
+                done();
+        })
+    })
     it('TC-305-1 Gebruiker is niet ingelogd', (done) => {
         const newMealData = {
             name: 'Pasta Bolognese',
