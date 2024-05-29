@@ -9,6 +9,7 @@ const jwtSecretKey = require('../src/util/config').secretkey
 chai.should()
 chai.use(chaiHttp)
 tracer.setLevel('warn')
+const db = require('../src/dao/dbconnection')
 
 const endpointToTest = '/api/meal'
 
