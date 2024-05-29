@@ -6,6 +6,7 @@ const expect = chai.expect
 const assert = require('assert')
 const jwt = require('jsonwebtoken')
 const jwtSecretKey = require('../src/util/config').secretkey
+const db = require('../src/dao/dbconnection')
 
 chai.should()
 chai.use(chaiHttp)
@@ -14,7 +15,10 @@ const endpointToTest = '/api/login'
 
 describe('UC101 Inloggen', () => {
     beforeEach((done) => {
-        done()
+        db.getConnection((err, connection) => {
+            if (err) throw err;
+                done();
+        })
     })
 
     it('TC-101-1 Verplicht veld ontbreekt', (done) => {
