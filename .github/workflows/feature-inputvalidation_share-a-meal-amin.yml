@@ -64,14 +64,7 @@ jobs:
             mysql:
                 image: mysql:5.7
                 ports:
-                  - 3306:3306
-                options: >-
-                  --health-cmd="mysqladmin ping -uroot -proot"
-                  --health-interval=10s 
-                  --health-timeout=5s 
-                  --health-retries=3
-                env:
-                    MYSQL_ROOT_PASSWORD: root
+                - 3306
 
         steps:
             - name: Download artifact from build job
@@ -82,20 +75,10 @@ jobs:
             - name: Unzip artifact for tests
               run: unzip release.zip
 
-            - name: Install newer MySQL client
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y mysql-client
-
-            - name: Wait for MySQL to be ready
-              run: |
-                  while ! mysqladmin ping -h 127.0.0.1 --silent; do
-                    echo "Waiting for database connection..."
-                    sleep 5
-                  done
-
             - name: Start MySQL connection from host
               run: |
+                  sudo /etc/init.d/mysql start
+                  sudo apt-get install -y mysql-client
                   mysql -h 127.0.0.1 -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "SHOW DATABASES;"
                   mysql -h 127.0.0.1 -uroot -p${{ env.MYSQL_ROOT_PASSWORD }} -e "CREATE DATABASE ${{env.DB_DATABASE}};"
 
