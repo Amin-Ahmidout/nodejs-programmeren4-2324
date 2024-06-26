@@ -54,7 +54,7 @@ function validateToken(req, res, next) {
           if (payload) {
               logger.debug("token is valid", payload);
               req.userId = payload.id;
-              logger.debug("userId set in request:", req.userId);  // Log the userId set
+              logger.debug("userId set in request:", req.userId);  
               next();
           }
       });
