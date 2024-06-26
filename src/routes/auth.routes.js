@@ -47,7 +47,7 @@ function validateToken(req, res, next) {
               logger.warn("Token invalid!" + err.message);
               next({
                   status: 401,
-                  message: "Token invalid!", //error message
+                  message: "Token invalid!", //
                   data: {},
               });
           }
