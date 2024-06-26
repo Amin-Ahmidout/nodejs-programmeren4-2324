@@ -111,7 +111,7 @@ getUserById(id, callback) {
         // Bestaande gegevens van de gebruiker
         const existingUser = results[0];
 
-        // Gegevens bijwerken met nieuwe waarden, indien aanwezig
+        // Gegevens bijwerken met nieuwe waarden
         const updatedUser = {
             firstName: newData.firstName || existingUser.firstName,
             lastName: newData.lastName || existingUser.lastName,
