@@ -43,7 +43,7 @@ let mealController = {
 
     deleteMeal: (req, res, next) => {
         const mealId = parseInt(req.params.mealId, 10);
-        const userId = req.userId; // Zorg ervoor dat je de userId hebt vanuit je auth middleware.
+        const userId = req.userId; // Zorg ervoor dat je de userId hebt vanuit je auth middleware
     
         mealService.deleteMeal(mealId, userId, (error, success) => {
             if (error) {
