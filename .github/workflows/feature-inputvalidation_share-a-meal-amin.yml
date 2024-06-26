@@ -114,7 +114,10 @@ jobs:
             - name: 'Login via Azure CLI'
               uses: azure/login@v1
               with:
-                  creds: ${{secrets.AZURE_CREDENTIALS}}
+                environment: 'production'
+                tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+                client-id: ${{ secrets.AZURE_CLIENT_ID }}
+                subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
                 
 
 
