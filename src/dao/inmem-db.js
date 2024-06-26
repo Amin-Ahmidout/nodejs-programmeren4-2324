@@ -41,7 +41,7 @@ const mysqlDb = {
     if (filters && Object.keys(filters).length) {
         for (const key of Object.keys(filters)) {
             // Add a check to ensure the field is valid
-            if (['firstName', 'lastName', 'emailAddress', 'isActive', 'id'].includes(key)) {
+            if (['firstName', 'lastName', 'emailAddress', 'isActive', 'id','city','street','roles','phoneNumber'].includes(key)) {
                 conditions.push(`${key} = ?`);
                 values.push(filters[key]);
             } else {
